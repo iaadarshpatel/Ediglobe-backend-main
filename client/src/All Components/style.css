@@ -1,0 +1,124 @@
+.bg-custom {
+  background-color: rgba(255, 255, 255, 0);
+  /* Transparent white */
+  --tw-bg-opacity: 0 !important;
+  /* Ensure no opacity */
+}
+
+.custom-shadow {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.custom-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  /* Removes any ring shadow */
+  border-color: black !important;
+  /* Applies black border to all sides */
+  border-top-color: black !important;
+  /* Ensures top border color is black */
+}
+
+.custom-input {
+  border-color: black !important;
+  /* Override default border color */
+  border-top-color: black !important;
+  /* Override top border color */
+}
+
+.element-slide-in-left {
+  animation: slidein 1.5s ease;
+}
+
+.element-slide-in-up {
+  animation: slideInUp 1s ease;
+}
+
+.lotti-slide-in-left {
+  animation: slideInLeft 2s ease;
+}
+
+.rounded-border {
+  border-radius: 0.75rem; /* Tailwind equivalent of rounded-xl */
+  border: 1px solid #D1D5DB; /* Tailwind equivalent of border-gray-300 */
+  border-bottom: none; /* Tailwind equivalent of border-b-0 */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Custom shadow */
+}
+
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* 1 column by default */
+  gap: 1rem; /* Equivalent to gap-4 (16px) */
+  margin-top: 0px !important;
+}
+
+/* styles.css or any of your CSS files */
+.custom-pagination-btn {
+  background-color: rgb(210, 22, 22);
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.custom-pagination-btn:hover {
+  background-color: black; /* Keeps the background black on hover */
+}
+
+
+@media (min-width: 768px) {
+  .custom-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for medium screens and up */
+    margin-top: 0px !important;
+  }
+}
+
+
+/* Generic slide-in animation from the right */
+@keyframes slidein {
+  from {
+    translate: 100vw 0;
+    /* Slide in from the right */
+    scale: 200% 1;
+    /* Scale horizontally */
+  }
+
+  to {
+    translate: 0 0;
+    /* End at original position */
+    scale: 100% 1;
+    /* Normal size */
+  }
+}
+
+/* Slide in from the top */
+@keyframes slideInUp {
+  from {
+    translate: 0 -100vh;
+    /* Slide in from above the viewport */
+    scale: 1 200%;
+    /* Scale vertically */
+  }
+
+  to {
+    translate: 0 0;
+    /* End at original position */
+    scale: 1 100%;
+    /* Normal size */
+  }
+}
+
+/* Slide in from the left */
+@keyframes slideInLeft {
+  from {
+    translate: -100vw 0;
+    /* Slide in from the left */
+    scale: 200% 1;
+    /* Scale horizontally */
+  }
+
+  to {
+    translate: 0 0;
+    /* End at original position */
+    scale: 100% 1;
+    /* Normal size */
+  }
+}
