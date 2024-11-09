@@ -57,6 +57,10 @@ mongoose.connection.once('open', async () => {
     await hashExistingPasswords(); // Hash existing plain text passwords
 });
 
+app.get('/', async(req, res) => {
+    res.send("Hello World!");
+})
+
 // Endpoint to fetch users from MongoDB database
 app.get("/getUsers", async (req, res) => {
     console.log('Fetching users...');
