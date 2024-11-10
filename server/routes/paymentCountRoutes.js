@@ -5,6 +5,6 @@ import authenticate from "../middleware/authenticate.js";
 const router = Router();  
 
 router.get('/searchpayment/:searchQuery', authenticate, paymentSearch);
-router.get('/payment/count', authenticate, paymentCount)
+router.get('/payment/count', paymentCount)
 
 export default router;  

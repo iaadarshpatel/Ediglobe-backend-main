@@ -15,16 +15,16 @@ const CheckPayments = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [cache, setCache] = useState({});
-  const [disabled, setDisabled] = useState(false); // Disable the button
-  const [showToast, setShowToast] = useState(false); // State to trigger the toast
+  const [disabled, setDisabled] = useState(false); 
+  const [showToast, setShowToast] = useState(false); 
   const navigate = useNavigate();
 
   const token = localStorage.getItem("Access Token");
   const fetcher = (url) =>
     fetch(url, {
-      headers: {
-        Authorization: token,  
-      },
+        headers: {
+            Authorization: token,
+        },
     }).then((res) => res.json());
   const { data, error: swrError } = useSWR('https://ediglobe-backend-main.onrender.com/paymentCount/payment/count', fetcher, {
     refreshInterval: 4000,
@@ -103,7 +103,7 @@ const CheckPayments = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (!isLoggedIn) {
-      navigate('/Dummy', { replace: true }); // Redirect if not logged in
+      navigate('/Employeelogin', { replace: true }); // Redirect if not logged in
     } else {
       // Show toast message after successful login
       setShowToast(true); // Show the toast message when logged in

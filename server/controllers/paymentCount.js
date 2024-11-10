@@ -81,7 +81,6 @@ const paymentCount  = async (req, res) => {
             postSalesAmounts.includes(payment.amount / 100)
         ).length
 
-        // Send both the count and the payments data
         res.json({
             count: countTodayPayments,
             payments: capturedTodayPayments,
