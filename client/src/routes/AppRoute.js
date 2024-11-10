@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import axios from 'axios';
-import ShowPayments from '../ShowPayments';
 import CreatePaymentLink from '../CreatePaymentLink';
 import PaymentCheck from '../Payments/PaymentCheck';
 import CheckPayments from '../All Components/CheckPayments';
@@ -19,36 +16,10 @@ import TeamTree from '../All Components/Team Structure/Tree';
 import TeamStructure from '../All Components/Team Structure/TeamStructure';
 
 const AppRoute = () => {
-    const [fetchedUsers, setFetchedUsers] = useState([]);
-    const [err, setErr] = useState(null);
-    const [errOnline, setErrOnline] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            setIsLoading(true);
-            setErrOnline(null);
-            try {
-                const response = await axios.get("http://localhost:3003/getUsers");
-                if (Array.isArray(response.data)) {
-                    setFetchedUsers(response.data);
-                } else {
-                    throw new Error('Unexpected data format');
-                }
-            } catch (error) {
-                setErrOnline(error.message);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchUsers();
-    }, []);
 
     return (
             <BrowserRouter>
                 <Routes>
-                    <Route path="/ShowPayments" element={<ShowPayments paymentData={fetchedUsers} />} />
                     <Route path="/PaymentCheck" element={<PaymentCheck />} />
                     <Route path="/CreatePaymentLink" element={<CreatePaymentLink />} />
                     <Route path="/Employeelogin" element={<Employeelogin />} />
@@ -66,7 +37,6 @@ const AppRoute = () => {
                     <Route path="/team" element={<TeamTree />} />
                     <Route path="/teamStructure" element={<TeamStructure />} />
                 </Routes>
-                {err && <div className="error">Error: {err}</div>}
             </BrowserRouter>
     );
 };
