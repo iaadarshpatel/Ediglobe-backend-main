@@ -161,11 +161,14 @@ const SideBar = ( ) => {
             </ListItemPrefix>
             Lead Gen.
           </ListItem>
-          <ListItem onClick={() => navigate("/teamStructure")} className={`border-b-0 p-3 ${open === 3 ? 'bg-blue-gray-50' : 'hover:bg-blue-gray-50'}`}>
+          <ListItem onClick={() => alert("Coming Soon!")}  className={`border-b-0 p-3 ${open === 3 ? 'bg-blue-gray-50' : 'hover:bg-blue-gray-50'}`}>
             <ListItemPrefix>
               <MdAccountTree className="h-5 w-5 text-black"/>
             </ListItemPrefix>
-            Team Structure
+            Team
+            <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1.5 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
+              Coming Soon
+            </span>
           </ListItem>
           <ListItem onClick={() => navigate("/profile")} className={`border-b-0 p-3 ${open === 3 ? 'bg-blue-gray-50' : 'hover:bg-blue-gray-50'}`}>
             <ListItemPrefix>

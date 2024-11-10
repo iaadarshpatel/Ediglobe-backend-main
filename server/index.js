@@ -1,11 +1,9 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import createUserModel from "./models/Users.js";
 import dotenv from "dotenv";
 import bodyParser from 'body-parser';
-import EmployeeAuthModel from "./models/EmployeeAuthModel.js";
 import connectDb from "./config/Db.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import leadsDistributionRoutes from "./routes/leadsDistributionRoutes.js";
@@ -21,17 +19,14 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 
-
 connectDb();
 
 // Create the UserModel using the mongoose connection
 const UserModel = createUserModel(mongoose.connection);
 
-
 app.get('/', async(req, res) => {
     res.send("Working!");
 })
-
 // Endpoint to fetch users from MongoDB database
 app.get("/getUsers", async (req, res) => {
     try {

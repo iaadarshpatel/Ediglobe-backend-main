@@ -9,8 +9,6 @@ import useSWR from 'swr';
 
 const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Amount Due", "Last Date", "Ob Form", "Domain"];
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 const SkeletonRow = () => (
   <tr className="animate-pulse">
     {TABLE_HEAD.map((_, index) => (
@@ -26,8 +24,12 @@ const AllPayments = () => {
   const [selectedTab, setSelectedTab] = useState('All');
 
   const Employee_Id = localStorage.getItem('employeeId');
-
-  // Use SWR to fetch data
+  const token = localStorage.getItem("Access Token")
+  const fetcher = (url) => fetch(url, {
+    headers: {
+      Authorization: token
+    }
+  }).then((res) => res.json());
   const { data, error } = useSWR(`http://localhost:3003/payment/allpayments/${Employee_Id}`, fetcher);
 
   const monthlySales = data?.monthlyCount || "Loading...";
@@ -140,7 +142,6 @@ const AllPayments = () => {
     const formattedDate = `${day}/${month}/${year}`;
     return formattedDate; // Return the formatted date
   }
-
 
   if (error) return <div>Error loading data</div>;
 

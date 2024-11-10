@@ -4,11 +4,9 @@ import axios from 'axios';
 import ShowPayments from '../ShowPayments';
 import CreatePaymentLink from '../CreatePaymentLink';
 import PaymentCheck from '../Payments/PaymentCheck';
-import Employeelogin from '../Payments/Employeelogin';
 import CheckPayments from '../All Components/CheckPayments';
 import AllPayments from '../All Components/AllPayments';
-import Dummy from '../All Components/Dummy';
-import RealTimeData from '../All Components/RealTimeData';
+import Employeelogin from '../All Components/Employeelogin';
 import LoginToastMessage from '../All Components/LoginToastMessage';
 import Attendance from '../All Components/Attendance';
 import LeadsDistribution from '../All Components/LeadsDistribution';
@@ -53,12 +51,10 @@ const AppRoute = () => {
                     <Route path="/ShowPayments" element={<ShowPayments paymentData={fetchedUsers} />} />
                     <Route path="/PaymentCheck" element={<PaymentCheck />} />
                     <Route path="/CreatePaymentLink" element={<CreatePaymentLink />} />
-                    <Route path="/Employeelogin" element={<Dummy />} />
+                    <Route path="/Employeelogin" element={<Employeelogin />} />
                     <Route path="/" element={<CheckPayments />} />
                     <Route path="/CheckPayments" element={<CheckPayments />} />
                     <Route path="/AllPayments" element={<AllPayments />} />
-                    <Route path="/Dummy" element={<Dummy />} />
-                    <Route path="/RealTimeData" element={<RealTimeData />} />
                     <Route path="/LoginToastMessage" element={<LoginToastMessage />} />
                     <Route path="/Attendance" element={<Attendance />} />
                     <Route path="/LeadsDistribution" element={<LeadsDistribution />} />
