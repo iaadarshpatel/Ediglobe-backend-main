@@ -26,14 +26,15 @@ const CheckPayments = () => {
         Authorization: token,  
       },
     }).then((res) => res.json());
-  const { data, error: swrError } = useSWR('https://ediglobe-backend-main.onrender.com/paymentCount/payment/count', fetcher);
+  const { data, error: swrError } = useSWR('https://ediglobe-backend-main.onrender.com/paymentCount/payment/count', fetcher, {
+    refreshInterval: 4000,
+  });
 
-  const salesCountNumber = data && typeof data.salesCount === 'number' ? data.salesCount : "Loading...";
   const postSalesCountNumber = data && typeof data.postSalesCount === 'number' ? data.postSalesCount : "Loading..";
+  const salesCountNumber = data && typeof data.salesCount === 'number' ? data.salesCount : "Loading...";
 
   const todayDate = new Date();
   const formattedDate = todayDate.toLocaleDateString('en-GB');
-  
 
   const storeInCache = (data) => {
     const identifiers = [data.id, data.order_id, data.email];

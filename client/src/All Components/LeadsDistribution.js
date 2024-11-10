@@ -45,7 +45,6 @@ const LeadsDistribution = () => {
 
   const handleOpen = () => setOpen(!open);
 
-
   const employeeId = localStorage.getItem('employeeId');
   const token = localStorage.getItem("Access Token");
   const fetcher = (url) => fetch(url, {

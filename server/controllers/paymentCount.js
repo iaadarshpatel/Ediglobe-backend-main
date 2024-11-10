@@ -56,13 +56,13 @@ const paymentCount  = async (req, res) => {
         if (!data.items) {
             throw new Error('Invalid response structure');
         }
-        const capturedPayments = data.items.filter(payment => payment.captured); // Hold successful payments
+        const capturedPayments = data.items.filter(payment => payment.captured); 
 
         // Filter payments captured today
         const capturedTodayPayments = capturedPayments.filter(payment => {
-            if (payment.captured) { // Check if payment was captured
+            if (payment.captured) { 
                 const captureDate = moment(payment.created_at * 1000).format('DD-MM-YYYY');
-                return captureDate === today; // Compare with today's date
+                return captureDate === today; 
             }
             return false;
         });
@@ -88,6 +88,8 @@ const paymentCount  = async (req, res) => {
             salesCount: salesCount,
             postSalesCount: postSalesCount
         });
+        console.log(postSalesCount, salesCount);
+        
     } catch (error) {
         console.error("Failed to fetch payments:", error);
         res.status(500).json({ error: 'Failed to fetch payments' });
