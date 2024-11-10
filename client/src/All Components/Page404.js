@@ -1,6 +1,6 @@
 import {Typography } from '@material-tailwind/react';
 import React from 'react';
-import errorImg from '../assets/error.svg';
+import errorImg from '../assets/error.webp';
 import { BellSlashIcon } from '@heroicons/react/24/solid';
 
 const Page404 = () => {

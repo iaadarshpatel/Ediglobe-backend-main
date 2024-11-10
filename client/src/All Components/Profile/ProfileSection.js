@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Profile from "../../assets/bg-profile.jpg"
+import Profile from "../../assets/bg-profile.webp"
 import { IconButton, ListItem, Typography } from "@material-tailwind/react";
 import { FaUser } from "react-icons/fa";
 import { BiLogoGmail } from "react-icons/bi";
@@ -21,7 +21,6 @@ const ProfileSection = () => {
   const {Employee_Id, Employee_Name, DOB, Designation, DOJ, Personal_Email, Office_Email, Phone, Profile_img
   } = allDetails.data || {};
   console.log(Employee_Id );
-  
   
 
   // Fetch advice on component mount
