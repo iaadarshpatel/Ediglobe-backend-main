@@ -23,6 +23,7 @@ const AppRoute = () => {
                     <Route path="/PaymentCheck" element={<PaymentCheck />} />
                     <Route path="/CreatePaymentLink" element={<CreatePaymentLink />} />
                     <Route path="/Employeelogin" element={<Employeelogin />} />
+                    <Route path="/Dummy" element={<Employeelogin />} />
                     <Route path="/" element={<CheckPayments />} />
                     <Route path="/CheckPayments" element={<CheckPayments />} />
                     <Route path="/AllPayments" element={<AllPayments />} />

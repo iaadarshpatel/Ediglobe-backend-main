@@ -10,7 +10,7 @@ import Typewriter from 'typewriter-effect';
 import './style.css';
 
 
-function Login1() {
+function Login() {
     const navigate = useNavigate();
     const [employeeCode, setEmployeeCode] = useState('');
     const [password, setPassword] = useState('');
@@ -245,4 +245,4 @@ function Login1() {
     );
 }
 
-export default Login1;
+export default Login;
