@@ -9,8 +9,8 @@ const Birthday = () => {
   
   useEffect(() => {
     const getBirthdays = async () => {
-      const token = localStorage.getItem("Access Token")
-      const response = await axios.get("http://localhost:3003/api/allemployees", {headers: {
+      const token = localStorage.getItem("Access Token");
+      const response = await axios.get("http://localhost:3003/employee/allemployees", {headers: {
         Authorization: token
       }});
       setBirthday(Array.isArray(response.data) ? response.data : []);
@@ -55,23 +55,20 @@ const Birthday = () => {
         >
           {todayBirthdays.map((item, index) => (
             <div key={index} className="relative flex items-center justify-center">
-              {/* Watermark */}
               <div className="absolute top-1 left-0 right-0 flex flex-col items-center justify-center opacity-15 text-5xl font-bold text-gray-200">
                 <Typography variant="h4">Happy</Typography>
                 <Typography variant="h1">Birthday!</Typography>
               </div>
-              {/* Birthday Details */}
               <div className="flex flex-col items-center rounded-lg shadow-md p-3">
                 <div className="flex flex-col items-center justify-center">
                   <Typography variant="h6">Happy</Typography>
                   <Typography variant="h3" className="mt-2">Birthday!</Typography>
                 </div>
 
-                {/* Check if Profile_img is not uploaded */}
                 <img
                   className="relative w-24 h-24 mb-3 overflow-hidden rounded-full shadow-2xl shadow-white transition-transform duration-300 transform hover:scale-105"
                   src={item.Profile_img !== "Not Uploaded" ? item.Profile_img : nobirthday}
-                  alt={`${item.Employee_Name} image`}
+                  alt="{`${item.Employee_Name} image`}"
                 />
                 <h5 className="mb-1 text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-400 to-blue-500">
                   {item.Employee_Name.slice(0, 18)}

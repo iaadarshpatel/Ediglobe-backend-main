@@ -22,34 +22,11 @@ app.use(cors());
 app.use(express.json());
 
 
-// Connect to MongoDB 
 connectDb();
 
 // Create the UserModel using the mongoose connection
 const UserModel = createUserModel(mongoose.connection);
 
-// Function to hash existing plain text passwords in employeesAuth collection
-async function hashExistingPasswords() {
-    try {
-        const employees = await EmployeeAuthModel.find({});
-        console.log('Hashing passwords...');
-        for (let employee of employees) {
-            if (employee.Password && !employee.Password.startsWith('$2b$')) { // Ensure the password is not already hashed
-                const hashedPassword = await bcrypt.hash(employee.Password, 10);
-                employee.Password = hashedPassword;
-                await employee.save();
-                console.log(`Hashed password for Employee ID: ${employee.Employee_Id}`);
-            }
-        }
-    } catch (error) {
-        console.error('Error hashing passwords:', error);
-    }
-}
-
-// Call the hashExistingPasswords function to hash the passwords after connection
-mongoose.connection.once('open', async () => {
-    await hashExistingPasswords(); // Hash existing plain text passwords
-});
 
 app.get('/', async(req, res) => {
     res.send("Working!");
@@ -67,22 +44,22 @@ app.get("/getUsers", async (req, res) => {
 });
 
 //API endpoint to get payments from Razorpay
-app.use('/api', paymentCountRoutes);
+app.use('/paymentCount', paymentCountRoutes);
 
 // Endpoint to attendance login
-app.use('/api', attendanceRoutes)
+app.use('/attendanceDetails', attendanceRoutes)
 
 // Endpoint to fetch PGFL LEADS
-app.use('/api', leadsDistributionRoutes);
-
-// Endpoint to get allPayments
-app.use('/api', paymentRoutes);
-
-// Endpoint to get employee details by Employee_Id
-app.use('/api', employeesRoutes)
+app.use('/leadsDistribute', leadsDistributionRoutes);
 
 // New endpoint to receive leads from frontend
-app.use('/api', leadsRoutes);
+app.use('/leads', leadsRoutes);
+
+// Endpoint to get allPayments
+app.use('/payment', paymentRoutes);
+
+// Endpoint to get employee details by Employee_Id
+app.use('/employee', employeesRoutes)
 
 // Start the server
 const PORT = process.env.PORT || 3000;

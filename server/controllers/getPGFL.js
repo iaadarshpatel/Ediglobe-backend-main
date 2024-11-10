@@ -8,7 +8,6 @@ const getPGFL = async (req, res) => {
         const response = await axios.get(process.env.PGFL_API_URL);
         const pgfl = response.data; // Assuming the API returns the desired data structure
         res.json(pgfl);
-        console.log('PGFL Loaded');
     } catch (error) {
         console.error('Error fetching PGFL records:', error);
         res.status(500).json({ error: 'Failed to fetch PGFL records' });

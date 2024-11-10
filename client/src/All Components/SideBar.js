@@ -103,14 +103,6 @@ const SideBar = ( ) => {
                     Check Payment
                   </ListItem>
                 </Link>
-                <Link to="/PendingPayment">
-                  <ListItem>
-                    <ListItemPrefix>
-                      <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                    </ListItemPrefix>
-                    Pending Payment
-                  </ListItem>
-                </Link>
                 <Link to="/AllPayments">
                   <ListItem>
                     <ListItemPrefix>

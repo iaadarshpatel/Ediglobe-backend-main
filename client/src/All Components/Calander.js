@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 
 const AttendanceShortForm = {
-  "P": "Present", 
+  "P": "Present",
   "LOP": "LOP",
   "HD": "Half day",
   "HDLL": "Half day late login",
@@ -34,7 +34,6 @@ const AttendanceColors = {
   "HOL": "text-orange-500",
 };
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const SkeletonLoader = () => {
   const cellSize = "h-16 w-full"; // Replace h-16 with the height you used in the calendar
@@ -56,17 +55,23 @@ const Calendar = () => {
   const [attendanceMap, setAttendanceMap] = useState({});
   const [employeeId, setEmployeeId] = useState(null);
 
-  // Use SWR to fetch data
-  const { data, error } = useSWR('http://localhost:3003/api/attendance', fetcher, {
+  const token = localStorage.getItem("Access Token");
+
+const fetcher = (url) =>
+  fetch(url, {
+    headers: {
+      Authorization: token,
+    },
+  }).then((res) => res.json());
+
+  const { data, error } = useSWR('http://localhost:3003/attendanceDetails/attendance', fetcher, {
     refreshInterval: 4000,
     onSuccess: (fetchedData) => {
-      // Save fetched data to localStorage
       localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
     }
   });
 
   useEffect(() => {
-    // Fetch employee ID from localStorage
     const storedEmployeeId = localStorage.getItem('employeeId');
     const storedData = localStorage.getItem('attendanceData');
 
@@ -111,8 +116,8 @@ const Calendar = () => {
 
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 lg:p-4 bg-black text-white rounded-border w-[95%] md:w-[90%] lg:w-[80%] h-[100%]">
-     {/* Watermark */}
-     
+      {/* Watermark */}
+
       {/* Calendar Header */}
       <div className="flex justify-between items-center mb-4">
         <button className="p-2 rounded bg-gray-800 hover:bg-gray-700 text-white" onClick={prevMonth}>
@@ -154,7 +159,7 @@ const Calendar = () => {
           const attendanceStatus = attendanceMap[formattedDate] || '';
           const shortForm = Object.keys(AttendanceShortForm).find(key => AttendanceShortForm[key] === attendanceStatus) || attendanceStatus;
           const attendanceColorClass = AttendanceColors[shortForm] || '';
-        
+
           return (
             <button
               key={day}
@@ -172,7 +177,7 @@ const Calendar = () => {
             </button>
           );
         })}
-        
+
       </div>
 
       {/* Show selected date */}

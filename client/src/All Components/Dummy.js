@@ -14,8 +14,8 @@ function Login1() {
     const navigate = useNavigate();
     const [employeeCode, setEmployeeCode] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false); // New state for loading
-    const [showButton, setShowButton] = useState(false); // New state for showing button
+    const [loading, setLoading] = useState(false); 
+    const [showButton, setShowButton] = useState(false); 
     const [error, setError] = useState('');
     const logOutTimer = 7200000; // 2 hours in milliseconds
     const logoutTimerRef = useRef(null);
@@ -53,7 +53,7 @@ function Login1() {
         }
     
         try {
-            const response = await axios.post('http://localhost:3003/api/auth/login', { employeeCode, password });
+            const response = await axios.post('http://localhost:3003/employee/auth/login', { employeeCode, password });
     
             if (response.status === 200) {
                 const token = response.data.token;

@@ -3,9 +3,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // Action creators
 export const fetchEmployeesDetails = createAsyncThunk('fetchEmployeesDetails', async () => {
+    const token = localStorage.getItem("Access Token")
     const storedEmployeeId = localStorage.getItem('employeeId');
-    const response = await axios.get(`http://localhost:3003/api/employees/${storedEmployeeId}`);
+    const response = await axios.get(`http://localhost:3003/employee/employees/${storedEmployeeId}`,{headers: {
+        Authorization: token
+    }});
     return response.data;
+    
 })
 
 const todoSlice = createSlice({

@@ -8,7 +8,6 @@ import Typewriter from 'typewriter-effect';
 import LottieFile from "./LottieFile";
 import useSWR from 'swr';
 import LoginToastMessage from "./LoginToastMessage";
-const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const CheckPayments = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,7 +19,14 @@ const CheckPayments = () => {
   const [showToast, setShowToast] = useState(false); // State to trigger the toast
   const navigate = useNavigate();
 
-  const { data, error: swrError } = useSWR('http://localhost:3003/api/payment/count', fetcher);
+  const token = localStorage.getItem("Access Token");
+  const fetcher = (url) =>
+    fetch(url, {
+      headers: {
+        Authorization: token,  
+      },
+    }).then((res) => res.json());
+  const { data, error: swrError } = useSWR('http://localhost:3003/paymentCount/payment/count', fetcher);
 
   const salesCountNumber = data && typeof data.salesCount === 'number' ? data.salesCount : "Loading...";
   const postSalesCountNumber = data && typeof data.postSalesCount === 'number' ? data.postSalesCount : "Loading..";
@@ -52,9 +58,10 @@ const CheckPayments = () => {
     }
 
     try {
-      const response = await axios.get(
-        `http://localhost:3003/api/searchpayment/${query}`
-      );
+      const token = localStorage.getItem("Access Token");
+      const response = await axios.get(`http://localhost:3003/paymentCount/searchpayment/${query}`, {headers: {
+        Authorization: token
+      }});
       if (response.data) {
         setResult(response.data);
         storeInCache(response.data);

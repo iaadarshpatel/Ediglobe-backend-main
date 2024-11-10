@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
 import ShowPayments from '../ShowPayments';
-import PaymentType from '../Payments/PaymentType';
 import CreatePaymentLink from '../CreatePaymentLink';
 import PaymentCheck from '../Payments/PaymentCheck';
 import Employeelogin from '../Payments/Employeelogin';
 import CheckPayments from '../All Components/CheckPayments';
-import PendingPayment from '../All Components/PendingPayment';
 import AllPayments from '../All Components/AllPayments';
 import Dummy from '../All Components/Dummy';
 import RealTimeData from '../All Components/RealTimeData';
@@ -55,11 +53,9 @@ const AppRoute = () => {
                     <Route path="/ShowPayments" element={<ShowPayments paymentData={fetchedUsers} />} />
                     <Route path="/PaymentCheck" element={<PaymentCheck />} />
                     <Route path="/CreatePaymentLink" element={<CreatePaymentLink />} />
-                    <Route path="/PaymentType" element={<PaymentType paymentData={fetchedUsers} isLoading={isLoading} />} />
                     <Route path="/Employeelogin" element={<Dummy />} />
                     <Route path="/" element={<CheckPayments />} />
                     <Route path="/CheckPayments" element={<CheckPayments />} />
-                    <Route path="/PendingPayment" element={<PendingPayment />} />
                     <Route path="/AllPayments" element={<AllPayments />} />
                     <Route path="/Dummy" element={<Dummy />} />
                     <Route path="/RealTimeData" element={<RealTimeData />} />

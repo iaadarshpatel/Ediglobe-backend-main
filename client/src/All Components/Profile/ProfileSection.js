@@ -20,6 +20,8 @@ const ProfileSection = () => {
 
   const {Employee_Id, Employee_Name, DOB, Designation, DOJ, Personal_Email, Office_Email, Phone, Profile_img
   } = allDetails.data || {};
+  console.log(Employee_Id );
+  
   
 
   // Fetch advice on component mount

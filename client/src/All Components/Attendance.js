@@ -5,8 +5,6 @@ import LottieFile from './LottieFile';
 import EmojiAttendance from './EmojiAttendance';
 import Calendar from './Calander';
 
-const customColor = '#1e2a5a';
-
 const Attendance = () => {
     return (
         <div className="flex h-[calc(100vh-0rem)] mt-1 opacity-1">

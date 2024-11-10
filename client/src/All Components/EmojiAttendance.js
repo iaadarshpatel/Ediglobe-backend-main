@@ -8,7 +8,6 @@ import useSWR from 'swr';
 
 const customColor = '#000000';
 
-
 const attendanceTypeDetails = [
     {
         type: 'Present',
@@ -89,8 +88,6 @@ const attendanceTypeDetails = [
     }
 ];
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 const EmojiAttendance = () => {
     const [isVisible, setIsVisible] = useState(true); // State to control visibility
     const [attendanceData, setAttendanceData] = useState([]);
@@ -98,12 +95,16 @@ const EmojiAttendance = () => {
     const [selectedMonth, setSelectedMonth] = useState('');
     const storedEmployeeId = localStorage.getItem('employeeId');
 
-
-    // Use SWR to fetch data
-    const { data, error } = useSWR('http://localhost:3003/api/attendance', fetcher, {
+    const token = localStorage.getItem("Access Token");
+    const fetcher = (url) =>
+      fetch(url, {
+        headers: {
+          Authorization: token,  
+        },
+      }).then((res) => res.json());
+    const { data, error } = useSWR('http://localhost:3003/attendanceDetails/attendance', fetcher, {
         refreshInterval: 4000,
         onSuccess: (fetchedData) => {
-            // Save fetched data to localStorage
             localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
         }
     });

@@ -7,9 +7,6 @@ import useSWR from 'swr';
 import SkeletonLoader from './SkeltonPgfl';
 import axios from 'axios';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
-
 const statusOptions = [
   { value: '', label: 'Select Status' },
   { value: 'DNP', label: '❌ DNP' },
@@ -37,7 +34,6 @@ const leadStatusOptions = [
   { id: 'Already Enrolled', display: '✅ Already Enrolled' }
 ];
 
-
 const LeadsDistribution = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [updatedLeads, setUpdatedLeads] = useState({});
@@ -51,14 +47,22 @@ const LeadsDistribution = () => {
 
 
   const employeeId = localStorage.getItem('employeeId');
-
-  const { data, error } = useSWR('http://localhost:3003/api/pgfl', fetcher, {
+  const token = localStorage.getItem("Access Token");
+  const fetcher = (url) => fetch(url, {
+    headers: {
+      Authorization: token,  
+    }
+  }).then((res) => res.json());
+  const { data, error } = useSWR('http://localhost:3003/leadsDistribute/pgfl', fetcher, {
     refreshInterval: 4000,
   });
 
   const fetchMatchedLeads = async () => {
     try {
-      const {data: leads } = await axios.get('http://localhost:3003/api/fetchLeads');
+      const token = localStorage.getItem("Access Token");
+      const {data: leads } = await axios.get('http://localhost:3003/leads/fetchLeads',{headers: {
+        Authorization: token
+      }});
       // Get the current employee ID from localStorage or other sources
       const employeeId = localStorage.getItem('employeeId');
 
@@ -208,8 +212,10 @@ const LeadsDistribution = () => {
     }));
 
     try {
-      const response = await axios.post('http://localhost:3003/api/updateLead', leadsToSave, {
+      const token = localStorage.getItem("Access Token");
+      const response = await axios.post('https://ediglobe-backend-main.onrender.com/leads/updateLead', leadsToSave, {
         headers: {
+          'Authorization': token,
           'Content-Type': 'application/json'
         }
       });
