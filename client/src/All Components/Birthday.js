@@ -6,9 +6,13 @@ import axios from 'axios';
 
 const Birthday = () => {
   const [birthday, setBirthday] = useState([]);
+  
   useEffect(() => {
     const getBirthdays = async () => {
-      const response = await axios.get("http://localhost:3003/api/allemployees");
+      const token = localStorage.getItem("Access Token")
+      const response = await axios.get("http://localhost:3003/api/allemployees", {headers: {
+        Authorization: token
+      }});
       setBirthday(Array.isArray(response.data) ? response.data : []);
     };
     getBirthdays();

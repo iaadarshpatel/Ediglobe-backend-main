@@ -56,6 +56,8 @@ function Login1() {
             const response = await axios.post('http://localhost:3003/api/auth/login', { employeeCode, password });
     
             if (response.status === 200) {
+                const token = response.data.token;
+                localStorage.setItem("Access Token", token);
                 // Clear existing timer if any
                 if (logoutTimerRef.current) {
                     clearTimeout(logoutTimerRef.current);
