@@ -126,7 +126,7 @@ function Login() {
                     </div>
                     {/* Login Form */}
                     <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center px-4 lg:px-8">
-                        <img src={logo} alt="Logo" className="h-16 mb-4" />
+                        <img src={logo} alt="Logo" className="h-16 mb-4 self-center element-slide-in-up" />
                         <Card shadow={false} className="w-full max-w-md p-4 border border-gray-300 bg-white">
                             <CardHeader shadow={false} floated={false} className="text-center">
                                 <div className="flex items-center justify-center mb-4">
@@ -141,7 +141,7 @@ function Login() {
                                             <Typography
                                                 variant="small"
                                                 color="white"
-                                                className="text-xs capitalize leading-none text-center px-2 md:px-4" // Responsive padding
+                                                className="text-xs capitalize leading-none text-center px-2 md:px-4"
                                             >
                                                 Introducing our latest Dashboard
                                             </Typography>
@@ -178,12 +178,15 @@ function Login() {
                                         <Input
                                             type="text"
                                             placeholder="Enter Employee Id"
+                                            className="w-full border-2 border-dashed !border !border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
                                             value={employeeCode}
                                             disabled={loading}
                                             onChange={(e) => setEmployeeCode(e.target.value)}
+                                            labelProps={{
+                                                className: "hidden",
+                                            }}
                                             icon={<UserIcon className="h-5 w-5 absolute left-1 text-black" />}
                                             containerProps={{ className: "min-w-[100px]" }}
-                                            className="border border-gray-300 text-gray-900 focus:ring-2 focus:ring-black focus:border-black"
                                         />
                                         <label htmlFor="password">
                                             <Typography
@@ -196,13 +199,19 @@ function Login() {
                                         </label>
                                         <Input
                                             id="password"
+                                            color="gray"
+                                            size="lg"
                                             type="password"
+                                            name="password"
                                             disabled={loading}
                                             placeholder="Password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            icon={<LockClosedIcon className="h-5 w-5 absolute left-1 text-black" />}
-                                            className="border border-gray-300 text-gray-900 focus:ring-2 focus:ring-black focus:border-black"
+                                            className="w-full border-2 border-dashed !border !border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                                            labelProps={{
+                                                className: "hidden",
+                                            }}
+                                            icon={<LockClosedIcon className="h-5 w-5 absolute left-2 text-black" />}
                                         />
                                     </div>
                                     {error && (

@@ -26,7 +26,7 @@ const Notification = () => {
 
             <div className='flex flex-col gap-2'>
               <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold">
-              Date: <Chip color='indigo' value="30th Sept 2024" className='text-white bg-black font-bold inline-block pt-2' />
+              Date: <Chip color='indigo' value="We'll Inform" className='text-white bg-black font-bold inline-block pt-2' />
               </Typography>
             
               <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold">
