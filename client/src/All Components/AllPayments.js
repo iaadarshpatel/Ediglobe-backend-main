@@ -30,7 +30,7 @@ const AllPayments = () => {
       Authorization: token
     }
   }).then((res) => res.json());
-  const { data, error } = useSWR(`http://localhost:3003/payment/allpayments/${Employee_Id}`, fetcher);
+  const { data, error } = useSWR(`https://ediglobe-backend-main.onrender.com/payment/allpayments/${Employee_Id}`, fetcher);
 
   const monthlySales = data?.monthlyCount || "Loading...";
   const totalObMonths = data?.totalMonths || [];

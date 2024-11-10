@@ -27,16 +27,6 @@ const UserModel = createUserModel(mongoose.connection);
 app.get('/', async(req, res) => {
     res.send("Working!");
 })
-// Endpoint to fetch users from MongoDB database
-app.get("/getUsers", async (req, res) => {
-    try {
-        const users = await UserModel.find().select("-order_id"); // Fetch users excluding order_id
-        res.json(users);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: 'Failed to fetch users' });
-    }
-});
 
 //API endpoint to get payments from Razorpay
 app.use('/paymentCount', paymentCountRoutes);

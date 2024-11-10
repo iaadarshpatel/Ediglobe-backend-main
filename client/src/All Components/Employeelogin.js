@@ -53,8 +53,8 @@ function Login1() {
         }
     
         try {
-            const response = await axios.post('http://localhost:3003/employee/auth/login', { employeeCode, password });
-    
+            const response = await axios.post('https://ediglobe-backend-main.onrender.com/employee/auth/login', { employeeCode, password });
+            
             if (response.status === 200) {
                 const token = response.data.token;
                 localStorage.setItem("Access Token", token);
@@ -97,7 +97,7 @@ function Login1() {
         localStorage.removeItem('employeeId');
         localStorage.removeItem('Employee_Name');
         localStorage.removeItem('loginTime');
-        navigate('/dummy', { replace: true });
+        navigate('/Employeelogin', { replace: true });
     };
 
     const defaultOptions = {

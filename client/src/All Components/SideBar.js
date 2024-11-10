@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Card, Badge, Typography, List, ListItem, ListItemPrefix, Accordion, AccordionHeader, AccordionBody,  Input, IconButton } from "@material-tailwind/react";
-import { BanknotesIcon, ChevronDownIcon, CalendarDateRangeIcon, MagnifyingGlassIcon, PowerIcon, BellAlertIcon, ChevronRightIcon, UserCircleIcon, TableCellsIcon, Bars3Icon, UserGroupIcon } from "@heroicons/react/24/solid";
+import { BanknotesIcon, ChevronDownIcon, CalendarDateRangeIcon, MagnifyingGlassIcon, PowerIcon, BellAlertIcon, ChevronRightIcon, UserCircleIcon, TableCellsIcon, Bars3Icon, UserGroupIcon, NewspaperIcon } from "@heroicons/react/24/solid";
 import { Link, useNavigate } from "react-router-dom";
 import { MdAccountTree } from "react-icons/md";
 import Birthday from "./Birthday";
-import TeamStructure from "./Team Structure/Tree";
+import avatar from '../assets/avatar.jpg'
 
 const SideBar = ( ) => {
 
@@ -14,8 +14,8 @@ const SideBar = ( ) => {
   const employeeName = localStorage.getItem('Employee_Name');
   const navigate = useNavigate();
 
+  
   const displayEmployeeName = employeeName ? employeeName.slice(0, 12) : '';
-
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const SideBar = ( ) => {
     if (isLoggedIn) {
       setEmployeeId(storedEmployeeId);
     } else {
-      navigate('/dummy', { replace: true });
+      navigate('/Employeelogin', { replace: true });
     }
   }, [navigate]);
 
@@ -32,7 +32,7 @@ const SideBar = ( ) => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('employeeId');
     localStorage.removeItem('toastShown');
-    navigate('/dummy', { replace: true });
+    navigate('/Employeelogin', { replace: true });
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -53,7 +53,7 @@ const SideBar = ( ) => {
         <div className="mb-2 flex items-center gap-4 p-4 bg-blue-gray-50 text-gray-700 rounded-xl border border-gray-300 border-b-0 custom-shadow">
           <Badge placement="top-end" overlap="circular" color="green" withBorder>
             <Avatar
-              src="https://docs.material-tailwind.com/img/face-2.jpg"
+              src={avatar}
               alt="avatar"
               withBorder={true}
               className="p-0.5"
@@ -166,6 +166,15 @@ const SideBar = ( ) => {
               <MdAccountTree className="h-5 w-5 text-black"/>
             </ListItemPrefix>
             Team
+            <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1.5 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
+              Coming Soon
+            </span>
+          </ListItem>
+          <ListItem onClick={() => alert("Coming Soon!")}  className={`border-b-0 p-3 ${open === 3 ? 'bg-blue-gray-50' : 'hover:bg-blue-gray-50'}`}>
+            <ListItemPrefix>
+              <NewspaperIcon className="h-5 w-5 text-black"/>
+            </ListItemPrefix>
+            DPS.
             <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1.5 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
               Coming Soon
             </span>

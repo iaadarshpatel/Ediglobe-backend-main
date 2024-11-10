@@ -5,7 +5,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchEmployeesDetails = createAsyncThunk('fetchEmployeesDetails', async () => {
     const token = localStorage.getItem("Access Token")
     const storedEmployeeId = localStorage.getItem('employeeId');
-    const response = await axios.get(`http://localhost:3003/employee/employees/${storedEmployeeId}`,{headers: {
+    const response = await axios.get(`https://ediglobe-backend-main.onrender.com/employee/employees/${storedEmployeeId}`,{headers: {
         Authorization: token
     }});
     return response.data;

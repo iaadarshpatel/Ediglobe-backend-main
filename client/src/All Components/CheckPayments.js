@@ -26,7 +26,7 @@ const CheckPayments = () => {
         Authorization: token,  
       },
     }).then((res) => res.json());
-  const { data, error: swrError } = useSWR('http://localhost:3003/paymentCount/payment/count', fetcher);
+  const { data, error: swrError } = useSWR('https://ediglobe-backend-main.onrender.com/paymentCount/payment/count', fetcher);
 
   const salesCountNumber = data && typeof data.salesCount === 'number' ? data.salesCount : "Loading...";
   const postSalesCountNumber = data && typeof data.postSalesCount === 'number' ? data.postSalesCount : "Loading..";
@@ -59,7 +59,7 @@ const CheckPayments = () => {
 
     try {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.get(`http://localhost:3003/paymentCount/searchpayment/${query}`, {headers: {
+      const response = await axios.get(`https://ediglobe-backend-main.onrender.com/paymentCount/searchpayment/${query}`, {headers: {
         Authorization: token
       }});
       if (response.data) {

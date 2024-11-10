@@ -53,14 +53,14 @@ const LeadsDistribution = () => {
       Authorization: token,  
     }
   }).then((res) => res.json());
-  const { data, error } = useSWR('http://localhost:3003/leadsDistribute/pgfl', fetcher, {
+  const { data, error } = useSWR('https://ediglobe-backend-main.onrender.com/leadsDistribute/pgfl', fetcher, {
     refreshInterval: 4000,
   });
 
   const fetchMatchedLeads = async () => {
     try {
       const token = localStorage.getItem("Access Token");
-      const {data: leads } = await axios.get('http://localhost:3003/leads/fetchLeads',{headers: {
+      const {data: leads } = await axios.get('https://ediglobe-backend-main.onrender.com/leads/fetchLeads',{headers: {
         Authorization: token
       }});
       // Get the current employee ID from localStorage or other sources

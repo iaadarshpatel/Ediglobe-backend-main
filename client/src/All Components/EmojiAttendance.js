@@ -97,17 +97,29 @@ const EmojiAttendance = () => {
 
     const token = localStorage.getItem("Access Token");
     const fetcher = (url) =>
-      fetch(url, {
-        headers: {
-          Authorization: token,  
-        },
-      }).then((res) => res.json());
-    const { data, error } = useSWR('http://localhost:3003/attendanceDetails/attendance', fetcher, {
+        fetch(url, {
+            headers: {
+                Authorization: token,
+            },
+        }).then((res) => res.json());
+    const { data, error } = useSWR('https://ediglobe-backend-main.onrender.com/attendanceDetails/attendance', fetcher, {
         refreshInterval: 4000,
         onSuccess: (fetchedData) => {
             localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
         }
     });
+
+    const SkeletonItem = () => (
+        <div className="flex items-center gap-3 rounded-lg py-2 animate-pulse">
+            <div className="flex items-center justify-center rounded-lg bg-gray-300 p-3">
+                <div className="h-6 w-6 bg-gray-300 rounded-full"></div>
+            </div>
+            <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+            </div>
+        </div>
+    );
 
     // Filter data based on storedEmployeeId
     useEffect(() => {
@@ -185,7 +197,6 @@ const EmojiAttendance = () => {
     }, [data, storedEmployeeId]);
 
     if (error) return <div>Error loading attendance data</div>;
-    if (!attendanceData.length) return <div>Loading...</div>;
 
     // Create an array of month-year options from the monthlyCounts
     const monthOptions = Object.keys(monthlyCounts);
@@ -297,11 +308,13 @@ const EmojiAttendance = () => {
                     />
                 </div>
                 {isVisible && (
-                        <div>
-                            <ul className={`grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 transition-opacity duration-300 ${isVisible ? '' : 'opacity-50 blur-sm'}`}>
-                                {/* List items */}
-
-                                {attendanceTypeDetails.map(({ type, icon, description, shortCode, textColor }) => (
+                    <div>
+                        <ul className={`grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 transition-opacity duration-300 ${isVisible ? '' : 'opacity-50 blur-sm'}`}>
+                            {!attendanceData.length
+                                ? Array.from({ length: 4 }).map((_, index) => (
+                                    <SkeletonItem key={index} />
+                                ))
+                                : attendanceTypeDetails.map(({ type, icon, description, shortCode, textColor }) => (
                                     <ListItem key={type} className="flex items-center gap-3 rounded-lg py-2 hover:bg-blue-gray-50">
                                         <div className="flex items-center justify-center rounded-lg bg-blue-gray-50 p-3">
                                             {icon}
@@ -310,7 +323,6 @@ const EmojiAttendance = () => {
                                             <Typography variant="text" color="blue-gray" className="text-sm font-bold">
                                                 {type}:
                                                 <span className="ml-2 text-blue-gray-900 font-bold text-base">
-                                                    {/* Optional chaining with a fallback value of 0 */}
                                                     {monthlyCounts?.[selectedMonth]?.[type] || 0}
                                                 </span>
                                             </Typography>
@@ -320,8 +332,8 @@ const EmojiAttendance = () => {
                                         </div>
                                     </ListItem>
                                 ))}
-                            </ul>
-                        </div>
+                        </ul>
+                    </div>
                 )}
             </div>
         </div>

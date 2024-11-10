@@ -37,7 +37,6 @@ const AttendanceColors = {
 
 const SkeletonLoader = () => {
   const cellSize = "h-16 w-full"; // Replace h-16 with the height you used in the calendar
-
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 lg:p-4 bg-black text-white rounded-border w-[95%] md:w-[90%] lg:w-[80%] h-[100%]">
       <div className="grid grid-cols-7 gap-2 mt-2">
@@ -64,7 +63,7 @@ const fetcher = (url) =>
     },
   }).then((res) => res.json());
 
-  const { data, error } = useSWR('http://localhost:3003/attendanceDetails/attendance', fetcher, {
+  const { data, error } = useSWR('https://ediglobe-backend-main.onrender.com/attendanceDetails/attendance', fetcher, {
     refreshInterval: 4000,
     onSuccess: (fetchedData) => {
       localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
@@ -116,7 +115,6 @@ const fetcher = (url) =>
 
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 lg:p-4 bg-black text-white rounded-border w-[95%] md:w-[90%] lg:w-[80%] h-[100%]">
-      {/* Watermark */}
 
       {/* Calendar Header */}
       <div className="flex justify-between items-center mb-4">

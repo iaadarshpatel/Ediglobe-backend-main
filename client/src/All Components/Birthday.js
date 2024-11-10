@@ -10,7 +10,7 @@ const Birthday = () => {
   useEffect(() => {
     const getBirthdays = async () => {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.get("http://localhost:3003/employee/allemployees", {headers: {
+      const response = await axios.get("https://ediglobe-backend-main.onrender.com/employee/allemployees", {headers: {
         Authorization: token
       }});
       setBirthday(Array.isArray(response.data) ? response.data : []);

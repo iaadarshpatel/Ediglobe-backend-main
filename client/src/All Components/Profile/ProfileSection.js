@@ -15,13 +15,24 @@ const customColor = '#000000';
 const ProfileSection = () => {
   const [advice, setAdvice] = useState("");
 
+  const SkeletonItem = () => (
+    <ListItem className="flex items-center gap-3 rounded-lg py-2 hover:bg-blue-gray-50 animate-pulse">
+    <div className="flex items-center justify-center rounded-lg bg-blue-gray-50 p-3 bg-gray-300">
+      <div className="w-6 h-6 bg-gray-400 rounded-full"></div>
+    </div>
+    <div className="flex-1">
+      <div className="h-4 bg-gray-400 rounded w-24 mb-2"></div>
+      <div className="h-4 bg-gray-400 rounded w-32"></div>
+    </div>
+  </ListItem>
+  );
+  
+
   const dispatch = useDispatch();
   const allDetails = useSelector(state => state.employeesDetails);
 
   const {Employee_Id, Employee_Name, DOB, Designation, DOJ, Personal_Email, Office_Email, Phone, Profile_img
   } = allDetails.data || {};
-  console.log(Employee_Id );
-  
 
   // Fetch advice on component mount
   useEffect(() => {
@@ -42,13 +53,13 @@ const ProfileSection = () => {
   }, [dispatch]);
 
   if(allDetails.isLoading){
-    return <h1>Loading...</h1>;
+    return <SkeletonItem />
 }
 
   return (
     <>
       <div>
-        <section className="relative pt-36 pb-8 bg-blue-gray-50 rounded-border">
+        <section className="relative pt-36 pb-4 bg-blue-gray-50 rounded-border">
           <img src={Profile} alt="cover" className="rounded-tr-lg rounded-tl-lg w-full absolute top-0 left-0 z-0 h-60 object-cover" />
 
           <div className="w-full max-w-7xl mx-auto px-6 md:px-8 relative z-10">
@@ -56,22 +67,20 @@ const ProfileSection = () => {
             <img 
               src={Profile_img}
               alt="user-avatar" 
-              className="border-4 w-48 h-48 border-solid border-white rounded-full object-cover object-center shadow-xl shadow-blue-gray-600/50" 
+              className="border-4 w-48 h-48 border-solid border-black-500 rounded-full object-cover object-center shadow-xl shadow-blue-gray-600/50" 
             />
             </div>
 
-            {/* Navigation Links */}
             <div className="flex flex-col sm:flex-row max-sm:gap-5 items-center justify-between mb-5">
               <ul className="flex items-center gap-5">
                 <li>
                 <div class="block max-lg:pl-6">
-                <h5 class="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white whitespace-nowrap mb-1.5">
-                  Welcome back,
-                </h5>
+                
               </div>
                 </li>
               </ul>
 
+              {/*Social Media*/}
               <div className="flex gap-4 justify-center">
                 <IconButton className="rounded bg-[#ea4335] hover:shadow-[#ea4335]/20 focus:shadow-[#ea4335]/20 active:shadow-[#ea4335]/10">
                   <i className="fab fa-google text-lg" />
@@ -89,14 +98,11 @@ const ProfileSection = () => {
 
               {/* Buttons */}
               <div className="flex items-center gap-4">
-                <button className="rounded-full border border-solid border-black-600 bg-black py-3 px-4 text-sm font-semibold text-white whitespace-nowrap shadow-sm shadow-transparent transition-all duration-500">
-                  Full Time
-                </button>
               </div>
             </div>
 
             {/* Name and description */}
-            <h3 className="text-center font-manrope font-bold text-3xl leading-10 text-gray-900 mb-3 ">
+            <h3 className="text-center font-manrope font-bold text-3xl leading-10 text-gray-900 mb-3">
               {Employee_Name}
             </h3>
 
