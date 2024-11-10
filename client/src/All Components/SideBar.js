@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { MdAccountTree } from "react-icons/md";
 import Birthday from "./Birthday";
 import avatar from '../assets/avatar.jpg'
+import {useDispatch, useSelector} from "react-redux";
+import { fetchEmployeesDetails } from "./redux/slice/employeeSlice";
 
 const SideBar = ( ) => {
 
@@ -13,6 +15,17 @@ const SideBar = ( ) => {
   const [employeeId, setEmployeeId] = useState(null);
   const employeeName = localStorage.getItem('Employee_Name');
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const allDetails = useSelector(state => state.employeesDetails);
+
+  const {Designation
+  } = allDetails.data || {};
+
+   // Fetch employee details on component mount
+   useEffect(() => {
+    dispatch(fetchEmployeesDetails());
+}, [dispatch]);
 
   
   const displayEmployeeName = employeeName ? employeeName.slice(0, 12) : '';
@@ -63,7 +76,7 @@ const SideBar = ( ) => {
           <div>
             <Typography variant="h6" style={{ color: customColor }}>{displayEmployeeName}</Typography>
             <Typography variant="small" color="gray" className="font-normal">
-              Web Developer
+              {Designation}
             </Typography>
             <span className="inline-flex items-center rounded-md bg-black px-2 py-1.5 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
               {employeeId || "login again"}
