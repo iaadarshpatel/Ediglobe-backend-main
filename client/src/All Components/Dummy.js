@@ -58,6 +58,7 @@ function Login1() {
             if (response.status === 200) {
                 const token = response.data.token;
                 localStorage.setItem("Access Token", token);
+                
                 // Clear existing timer if any
                 if (logoutTimerRef.current) {
                     clearTimeout(logoutTimerRef.current);

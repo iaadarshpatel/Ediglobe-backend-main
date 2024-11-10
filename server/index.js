@@ -21,11 +21,6 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
-});
 
 // Connect to MongoDB 
 connectDb();
@@ -46,7 +41,6 @@ async function hashExistingPasswords() {
                 console.log(`Hashed password for Employee ID: ${employee.Employee_Id}`);
             }
         }
-        console.log('All plain text passwords in employeesAuth have been hashed');
     } catch (error) {
         console.error('Error hashing passwords:', error);
     }
@@ -58,15 +52,13 @@ mongoose.connection.once('open', async () => {
 });
 
 app.get('/', async(req, res) => {
-    res.send("Hello World!");
+    res.send("Working!");
 })
 
 // Endpoint to fetch users from MongoDB database
 app.get("/getUsers", async (req, res) => {
-    console.log('Fetching users...');
     try {
         const users = await UserModel.find().select("-order_id"); // Fetch users excluding order_id
-        console.log('Fetched users');
         res.json(users);
     } catch (err) {
         console.error('Error fetching users:', err);
@@ -95,5 +87,5 @@ app.use('/api', leadsRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running at ${PORT}`);
 });
