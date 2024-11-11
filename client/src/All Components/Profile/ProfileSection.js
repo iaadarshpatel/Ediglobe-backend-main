@@ -7,8 +7,8 @@ import { BiLogoGmail } from "react-icons/bi";
 import { MdMail } from "react-icons/md";
 import { FaPhoneAlt, FaIdBadge, FaBirthdayCake, FaUserCog } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchEmployeesDetails} from "../redux/slice/employeeSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../redux/slice/employeeSlice";
 
 const customColor = '#000000';
 
@@ -17,21 +17,21 @@ const ProfileSection = () => {
 
   const SkeletonItem = () => (
     <ListItem className="flex items-center gap-3 rounded-lg py-2 hover:bg-blue-gray-50 animate-pulse">
-    <div className="flex items-center justify-center rounded-lg bg-blue-gray-50 p-3 bg-gray-300">
-      <div className="w-6 h-6 bg-gray-400 rounded-full"></div>
-    </div>
-    <div className="flex-1">
-      <div className="h-4 bg-gray-400 rounded w-24 mb-2"></div>
-      <div className="h-4 bg-gray-400 rounded w-32"></div>
-    </div>
-  </ListItem>
+      <div className="flex items-center justify-center rounded-lg bg-blue-gray-50 p-3 bg-gray-300">
+        <div className="w-6 h-6 bg-gray-400 rounded-full"></div>
+      </div>
+      <div className="flex-1">
+        <div className="h-4 bg-gray-400 rounded w-24 mb-2"></div>
+        <div className="h-4 bg-gray-400 rounded w-32"></div>
+      </div>
+    </ListItem>
   );
-  
+
 
   const dispatch = useDispatch();
   const allDetails = useSelector(state => state.employeesDetails);
 
-  const {Employee_Id, Employee_Name, DOB, Designation, DOJ, Personal_Email, Office_Email, Phone, Profile_img
+  const { Employee_Id, Employee_Name, DOB, Designation, DOJ, Personal_Email, Office_Email, Phone, Profile_img
   } = allDetails.data || {};
 
   // Fetch advice on component mount
@@ -49,12 +49,12 @@ const ProfileSection = () => {
 
   // Fetch employee details on component mount
   useEffect(() => {
-      dispatch(fetchEmployeesDetails());
+    dispatch(fetchEmployeesDetails());
   }, [dispatch]);
 
-  if(allDetails.isLoading){
+  if (allDetails.isLoading) {
     return <SkeletonItem />
-}
+  }
 
   return (
     <>
@@ -64,19 +64,19 @@ const ProfileSection = () => {
 
           <div className="w-full max-w-7xl mx-auto px-6 md:px-8 relative z-10">
             <div className="flex items-center justify-center mb-2.5 ">
-            <img 
-              src={Profile_img}
-              alt="user-avatar" 
-              className="border-4 w-48 h-48 border-solid border-black-500 rounded-full object-cover object-center shadow-xl shadow-blue-gray-600/50" 
-            />
+              <img
+                src={Profile_img}
+                alt="user-avatar"
+                className="border-4 w-48 h-48 border-solid border-black-500 rounded-full object-cover object-center shadow-xl shadow-blue-gray-600/50"
+              />
             </div>
 
             <div className="flex flex-col sm:flex-row max-sm:gap-5 items-center justify-between mb-5">
               <ul className="flex items-center gap-5">
                 <li>
-                <div class="block max-lg:pl-6">
-                
-              </div>
+                  <div class="block max-lg:pl-6">
+
+                  </div>
                 </li>
               </ul>
 
@@ -125,9 +125,10 @@ const ProfileSection = () => {
                     fill="black" // Changed color to black
                   />
                 </svg>
-                <p className="font-normal text-base leading-7 text-gray-500 text-center">
+                <p className="font-normal text-base leading-7 text-transparent bg-gradient-to-r from-red-500 via-orange-500 to-purple-500 bg-clip-text text-center">
                   {advice}
                 </p>
+
                 <svg
                   className="w-8 h-8 ml-2 mb-4" // Add margin to the left for spacing
                   width="32"
