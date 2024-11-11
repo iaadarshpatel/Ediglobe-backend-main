@@ -6,8 +6,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import { Card, Input, Typography, CardBody, Chip, } from "@material-tailwind/react";
 import useSWR from 'swr';
 
-
-const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Amount Due", "Last Date", "Ob Form", "Domain"];
+const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Amount Due", "Last Date", "Ob Form", "Domain", "Payment Status"];
 
 const SkeletonRow = () => (
   <tr className="animate-pulse">
@@ -265,7 +264,7 @@ const AllPayments = () => {
                       Array.from({ length: 10 }).map((_, i) => <SkeletonRow key={i} />)
                     ) : filteredPayments.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="text-center p-4">No Payments found</td>
+                        <td colSpan={10} className="text-center p-4">No Payments found</td>
                       </tr>
                     ) : (
                       filteredPayments.map((payment, index) => {
@@ -364,6 +363,26 @@ const AllPayments = () => {
                                 className="font-normal"
                               >
                                 {payment.domain_opted}
+                              </Typography>
+                            </td>
+                            <td className={classes}>
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className={`font-bold text-center border border-black rounded-md px-2 py-1 ${payment.payment_status === 'PAID' ? 'bg-green-500 text-white' :
+                                    payment.payment_status === 'NOT INTERESTED' ? 'bg-red-200 text-black' :
+                                      payment.payment_status === 'NO RESPONSE' ? 'bg-yellow-200 text-black' :
+                                        payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' :  // Updated to light orange
+                                          payment.payment_status === 'REFUND' ? 'bg-red-500 text-white' :
+                                            payment.payment_status === 'MORE TIME REQ.' ? 'bg-blue-200 text-black' :
+                                              payment.payment_status === 'WRONG PITCH' ? 'bg-brown-700 text-white' :
+                                                payment.payment_status === 'PARTIAL PAYMENT' ? 'bg-green-200 text-black' :
+                                                  payment.payment_status === 'SPAM' ? 'bg-gray-400 text-black' :
+                                                    payment.payment_status === 'Will update' ? 'bg-purple-200 text-black' :
+                                                      'bg-black text-white'  // Default to black background with white text
+                                  }`}
+                              >
+                                {payment.payment_status}
                               </Typography>
                             </td>
                           </tr>
