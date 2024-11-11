@@ -372,7 +372,7 @@ const AllPayments = () => {
                                 className={`font-bold text-center border border-black rounded-md px-2 py-1 ${payment.payment_status === 'PAID' ? 'bg-green-500 text-white' :
                                     payment.payment_status === 'NOT INTERESTED' ? 'bg-red-200 text-black' :
                                       payment.payment_status === 'NO RESPONSE' ? 'bg-yellow-200 text-black' :
-                                        payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' :  // Updated to light orange
+                                        payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' : 
                                           payment.payment_status === 'REFUND' ? 'bg-red-500 text-white' :
                                             payment.payment_status === 'MORE TIME REQ.' ? 'bg-blue-200 text-black' :
                                               payment.payment_status === 'WRONG PITCH' ? 'bg-brown-700 text-white' :
