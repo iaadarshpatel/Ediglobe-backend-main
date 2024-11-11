@@ -58,9 +58,9 @@ const employeeAuth = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign(
-            { id: employee._id, employeeCode: employee.Employee_Id }, // Payload data
-            process.env.JWT_SECRET_KEY, // Access secret key from environment variable
-            { expiresIn: '1h' } // Token expiration
+            { id: employee._id, employeeCode: employee.Employee_Id },
+            process.env.JWT_SECRET_KEY, 
+            { expiresIn: '1h' } 
         );
 
         // Log the token to the console

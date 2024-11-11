@@ -93,6 +93,7 @@ const SideBar = ( ) => {
             placeholder="Search..."
           />
         </div>
+        <hr className="my-4 border-black-gray-50" />
 
         {/* Sidebar List */}
         <List>
