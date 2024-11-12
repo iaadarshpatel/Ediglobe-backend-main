@@ -166,6 +166,7 @@ const CheckPayments = () => {
           </div>
         )}
         </div>
+
           <Typography>
             <div className="min-h-full flex flex-col justify-center">
               <div className="sm:mx-auto sm:w-full sm:max-w-md">

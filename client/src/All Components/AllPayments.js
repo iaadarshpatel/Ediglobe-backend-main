@@ -384,7 +384,7 @@ const AllPayments = () => {
                                                       'bg-black text-white'  // Default to black background with white text
                                   }`}
                               >
-                                {payment.payment_status}
+                               {payment.payment_status || 'Not Updated yet'}
                               </Typography>
                             </td>
                           </tr>

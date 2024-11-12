@@ -62,7 +62,7 @@ const SideBar = ( ) => {
       </div>
 
       {/* Sidebar Container */}
-      <Card className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-64 w-full lg:max-w-[18rem] h-full p-4 bg-white custom-shadow overflow-y-auto z-50 overflow-x-hidden`}>
+      <Card className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-64 w-full lg:max-w-[18rem] h-100% p-4 bg-white custom-shadow overflow-y-auto z-50 overflow-x-hidden`}>
         <div className="mb-2 flex items-center gap-4 p-4 bg-blue-gray-50 text-gray-700 rounded-xl border border-gray-300 border-b-0 custom-shadow">
           <Badge placement="top-end" overlap="circular" color="green" withBorder>
             <Avatar
@@ -85,14 +85,14 @@ const SideBar = ( ) => {
         </div>
 
         {/* Search Input */}
-        <div className="p-2">
+        {/* <div className="p-2">
           <Input
             className="rounded-md focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
             labelProps={{ className: "hidden" }}
             icon={<MagnifyingGlassIcon className="h-5 w-5" />}
             placeholder="Search..."
           />
-        </div>
+        </div> */}
         <hr className="my-2 border-black-gray-50" />
 
         {/* Sidebar List */}
