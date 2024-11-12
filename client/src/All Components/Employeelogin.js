@@ -17,17 +17,18 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [showButton, setShowButton] = useState(false);
     const [error, setError] = useState('');
-    const logOutTimer = 7200000; // 2 hours in milliseconds
+    const logOutTimer = 7200000;
     const logoutTimerRef = useRef(null);
     const [showAnimation, setShowAnimation] = useState(window.innerWidth >= 600);
 
     useEffect(() => {
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         const loginTime = localStorage.getItem('loginTime');
+        
         if (isLoggedIn && loginTime) {
             const currentTime = new Date().getTime();
             const timeElapsed = currentTime - parseInt(loginTime, 10);
-
+    
             if (timeElapsed >= logOutTimer) {
                 handleLogout(); // Auto logout if the time elapsed exceeds the logout timer
             } else {
@@ -35,18 +36,22 @@ function Login() {
                 setTimeout(handleLogout, timeRemaining); // Set timeout for remaining time
             }
         }
+    
         if (isLoggedIn) {
             navigate('/CheckPayments', { replace: true });
         }
+    
         const handleResize = () => {
             setShowAnimation(window.innerWidth >= 600);
         };
+        
         window.addEventListener('resize', handleResize);
+        
         return () => {
             window.removeEventListener('resize', handleResize);
         };
     }, [navigate]);
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');

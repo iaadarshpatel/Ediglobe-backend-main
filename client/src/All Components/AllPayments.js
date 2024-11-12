@@ -165,11 +165,11 @@ const AllPayments = () => {
               <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold mt-1 flex items-center">
                 Daily Payments:
                 <span className="text-green-500 ml-2">Count of Payments</span>
-                <Chip color='indigo' value="0" className='text-white bg-black font-bold inline-block pt-2 ml-1' />
+                <Chip color='indigo' value="Coming Soon" className='text-white bg-black font-bold inline-block pt-2 ml-1' />
                 {/* Vertical line */}
                 <span className="mx-4 border-l border-gray-500 h-6 inline-block"></span>
                 <span className="text-red-500">Amount Received</span>
-                <Chip color='indigo' value="0" className='text-white bg-black font-bold inline-block pt-2 ml-1' />
+                <Chip color='indigo' value="Coming Soon" className='text-white bg-black font-bold inline-block pt-2 ml-1' />
               </Typography>
             </div>
             <div className='pt-1 mb-2 flex flex-col items-center justify-between gap-4 md:flex-row'>
@@ -379,6 +379,8 @@ const AllPayments = () => {
                                                 payment.payment_status === 'PARTIAL PAYMENT' ? 'bg-green-200 text-black' :
                                                   payment.payment_status === 'SPAM' ? 'bg-gray-400 text-black' :
                                                     payment.payment_status === 'Will update' ? 'bg-purple-200 text-black' :
+                                                    payment.payment_status === 'College Issue' ? 'bg-pink-200 text-black' :
+                                                    payment.payment_status === 'DEMO' ? 'bg-purple-200 text-black' :
                                                       'bg-black text-white'  // Default to black background with white text
                                   }`}
                               >

@@ -171,7 +171,7 @@ const CheckPayments = () => {
               <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <form onSubmit={handleCheck} method="POST" className="space-y-6">
                   <div className="text-center">
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl ">
+                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-3xl ">
                       Check Your Current
                       <Typewriter
                         options={{
