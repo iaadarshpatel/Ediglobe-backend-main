@@ -82,7 +82,7 @@ const attendanceTypeDetails = [
     {
         type: 'Holiday',
         icon: <GiWitchFlight style={{ color: customColor, fontSize: '1.2rem' }} />,
-        description: 'Unclear status',
+        description: 'Holiday',
         shortCode: '[HOL]',
         textColor: 'text-orange-500'
     }
