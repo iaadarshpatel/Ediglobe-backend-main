@@ -249,7 +249,6 @@ const LeadsDistribution = () => {
   };
 
 
-
   if (error) return <div>Error loading data</div>;
 
 
@@ -379,7 +378,7 @@ const LeadsDistribution = () => {
               <table className="w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
-                    {["Student Name", "Contact", "Course Name", "Year", "College", "Status"].map((head) => (
+                    {["Student Name", "Contact", "Course Name", "State", "College", "Status"].map((head) => (
                       <th key={head} className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
                         <Typography variant="small" className="font-bold leading-none text-black">
                           {head}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Typography, ListItem, Tooltip, Switch } from "@material-tailwind/react";
 import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock } from 'react-icons/fa';
-import { GiMoneyStack } from 'react-icons/gi';
+import { GiMoneyStack, GiWitchFlight } from 'react-icons/gi';
 import { MdPunchClock, MdSick } from 'react-icons/md';
 import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
@@ -81,7 +81,7 @@ const attendanceTypeDetails = [
     },
     {
         type: 'Holiday',
-        icon: <FaQuestionCircle style={{ color: customColor, fontSize: '1.2rem' }} />,
+        icon: <GiWitchFlight style={{ color: customColor, fontSize: '1.2rem' }} />,
         description: 'Unclear status',
         shortCode: '[HOL]',
         textColor: 'text-orange-500'
