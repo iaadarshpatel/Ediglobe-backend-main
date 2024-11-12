@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Card, Badge, Typography, List, ListItem, ListItemPrefix, Accordion, AccordionHeader, AccordionBody,  Input, IconButton } from "@material-tailwind/react";
-import { BanknotesIcon, ChevronDownIcon, CalendarDateRangeIcon, MagnifyingGlassIcon, PowerIcon, BellAlertIcon, ChevronRightIcon, UserCircleIcon, TableCellsIcon, Bars3Icon, UserGroupIcon, NewspaperIcon } from "@heroicons/react/24/solid";
+import { BanknotesIcon, ChevronDownIcon, CalendarDateRangeIcon, PowerIcon, BellAlertIcon, ChevronRightIcon, UserCircleIcon, TableCellsIcon, Bars3Icon, UserGroupIcon, NewspaperIcon } from "@heroicons/react/24/solid";
 import { Link, useNavigate } from "react-router-dom";
 import { MdAccountTree } from "react-icons/md";
 import Birthday from "./Birthday";
@@ -62,7 +62,7 @@ const SideBar = ( ) => {
       </div>
 
       {/* Sidebar Container */}
-      <Card className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-64 w-full lg:max-w-[18rem] h-100% p-4 bg-white custom-shadow overflow-y-auto z-50 overflow-x-hidden`}>
+      <Card className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-64 w-full lg:max-w-[18rem] h-full p-4 bg-white custom-shadow overflow-y-auto z-50 overflow-x-hidden`}>
         <div className="mb-2 flex items-center gap-4 p-4 bg-blue-gray-50 text-gray-700 rounded-xl border border-gray-300 border-b-0 custom-shadow">
           <Badge placement="top-end" overlap="circular" color="green" withBorder>
             <Avatar
@@ -210,7 +210,6 @@ const SideBar = ( ) => {
         </List>
         <Birthday/>
       </Card>
-
     </div>
   );
 };

@@ -146,7 +146,7 @@ const AllPayments = () => {
 
   return (
     <>
-      <div className="flex h-[calc(100vh-0rem)] mt-1 opacity-1">
+      <div className="flex h-full mt-1 opacity-1">
         <LottieFile />
         <SideBar />
         <Card className="h-full w-full mx-2 opacity-1 bg-custom shadow-none">
@@ -198,7 +198,6 @@ const AllPayments = () => {
                 <Chip color='indigo' value={ObFormFilled} className='text-white bg-black font-bold inline-block pt-2 ml-1' />
               </Typography>
             </div>
-
             <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
               <div className="flex items-center gap-4">
                 <Typography variant="md" color="blue-gray" className="whitespace-nowrap">
@@ -232,13 +231,11 @@ const AllPayments = () => {
               </div>
 
             </div>
-
           </div>
 
-
           {/* Scrollable card body for the table */}
-          <div className="my-1">
-            <CardBody className="h-[calc(100vh-8rem)] overflow-y-auto px-0 text-gray-700 rounded-xl border border-gray-300">
+          <div className="mt-1">
+            <CardBody className="h-screen overflow-y-auto px-0 text-gray-700 rounded-xl border border-gray-300">
               <div className="overflow-x-auto">
                 <table className="min-w-full table-auto text-left border-collapse">
                   <thead className="bg-blue-gray-50/50 sticky top-0 z-10">
@@ -397,7 +394,6 @@ const AllPayments = () => {
               </div>
             </CardBody>
           </div>
-
 
         </Card>
       </div>

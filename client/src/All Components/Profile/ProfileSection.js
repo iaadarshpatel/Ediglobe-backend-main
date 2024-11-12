@@ -58,7 +58,6 @@ const ProfileSection = () => {
 
   return (
     <>
-      <div>
         <section className="relative pt-36 pb-4 bg-blue-gray-50 rounded-border">
           <img src={Profile} alt="cover" className="rounded-tr-lg rounded-tl-lg w-full absolute top-0 left-0 z-0 h-60 object-cover" />
 
@@ -302,7 +301,6 @@ const ProfileSection = () => {
           </div>
         </section>
 
-      </div>
     </>
   );
 };

@@ -255,7 +255,7 @@ const LeadsDistribution = () => {
 
   return (
     <>
-      <div className="flex h-[calc(100vh-0rem)] mt-1 opacity-1">
+      <div className="flex h-full my-1 opacity-1">
         <LottieFile />
         <SideBar />
         <Card className="h-full w-full mx-2 opacity-1 bg-custom shadow-none">
@@ -375,7 +375,7 @@ const LeadsDistribution = () => {
 
           {/* Leads Table */}
           <div className="mt-1">
-            <CardBody className="h-[calc(100vh-8rem)] overflow-y-auto px-0 text-gray-700 rounded-xl border border-gray-300">
+            <CardBody className="h-screen overflow-y-auto px-0 text-gray-700 rounded-xl border border-gray-300">
               <table className="w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
@@ -503,11 +503,6 @@ const LeadsDistribution = () => {
                 </tbody>
               </table>
             </CardBody>
-          </div>
-
-          {/* Footer */}
-          <div className="py-4 text-center">
-            <Typography variant="small" color="gray" className="font-normal">Total records fetched: {data ? data.length : 0}</Typography>
           </div>
         </Card>
       </div>

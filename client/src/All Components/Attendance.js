@@ -7,7 +7,7 @@ import Calendar from './Calander';
 
 const Attendance = () => {
     return (
-        <div className="flex h-[calc(100vh-0rem)] mt-1 opacity-1">
+        <div className="flex h-full mt-1 opacity-1">
             <LottieFile />
             <SideBar />
             <Card className="h-full w-full bg-custom shadow-none">

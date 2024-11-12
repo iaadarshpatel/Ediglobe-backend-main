@@ -139,7 +139,7 @@ const CheckPayments = () => {
     <>
       {/* Render LoginToastMessage only when showToast is true */}
       {showToast && <LoginToastMessage />}
-      <div className="flex h-[calc(100vh-0rem)] opacity-1 z-10 mt-1">
+      <div className="flex h-full opacity-1 z-10 mt-1">
         <LottieFile />
         <SideBar />
         <div className="flex-1 flex items-center justify-center mx-2 p-9 z-10">

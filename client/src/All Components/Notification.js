@@ -7,7 +7,7 @@ import Page404 from './Page404';
 const Notification = () => {
   return (
     <>
-      <div className="flex h-[calc(100vh-0rem)] mt-1 opacity-1">
+      <div className="flex h-full my-1 opacity-1">
         <LottieFile />
         <SideBar />
         <Card className="h-full w-full mx-2 opacity-1 bg-custom shadow-none">
@@ -38,7 +38,7 @@ const Notification = () => {
 
           {/* Scrollable card body for the table */}
           <div className="mt-1">
-            <CardBody className="h-[calc(100vh-8rem)] overflow-y-auto px-4 py-3 text-gray-700 rounded-xl border border-gray-300 bg-transparent">
+            <CardBody className="h-screen overflow-y-auto px-4 py-3 text-gray-700 rounded-xl border border-gray-300 bg-transparent">
               <div className="p-3 mb-3 bg-blue-gray-50 rounded-border">
                 <div className="mb-6 w-1/2">
                   <Typography variant="lg" color="blue-gray" className="font-bold">Subject: Exciting New Notification Feature  for Employees</Typography>
@@ -60,7 +60,6 @@ const Notification = () => {
               </div>
             </CardBody>
           </div>
-
         </Card>
       </div>
     </>
