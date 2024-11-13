@@ -30,7 +30,7 @@ const paymentSearch = async (req, res) => {
             throw new Error('Invalid response structure');
         }
         const capturedPayments = data.items.filter(payment => payment.captured); // Hold successful payments
-
+        
         const matchedPayment = capturedPayments.find(
             (payment) =>
                 payment.email === searchQuery ||
