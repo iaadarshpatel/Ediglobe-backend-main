@@ -118,11 +118,11 @@ function Login() {
 
     return ( 
         <div className='h-full p-4'>
-            <section className="mt-4 h-full flex items-center">
+            <section className="mt-12 h-full flex items-center">
                 <div className="container mx-auto flex flex-col lg:flex-row w-full max-w-screen-xl h-full">
                     <div className="flex flex-col lg:flex-row w-full items-center lg:items-stretch">
                         {/* Lottie Animation */}
-                        <div className="w-full lg:w-1/2 flex justify-center items-center mb-2 lg:mb-0">
+                        <div className="w-full lg:w-1/2 flex justify-center items-center lg:mb-0">
                             {showAnimation && <Lottie options={defaultOptions} height={300} width={300} />}
                         </div>
                         {/* Login Form */}
