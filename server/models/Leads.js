@@ -10,6 +10,7 @@ const leadSchema = new mongoose.Schema({
     year: { type: String, required: true, default: 2020 },
     college: { type: String, required: true, default: 'Unknown College' },
     status: { type: String, required: true, default: 'Pending' },
+    note: { type: String, required: true,  default: 'Pending' },
   },
   {timestamps: true}
 );

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Carousel } from "@material-tailwind/react";
 import nobirthday from '../assets/nobirthday.webp';
 import axios from 'axios';
+import config from '../config.js';
 
 const Birthday = () => {
   const [birthday, setBirthday] = useState([]);
@@ -10,7 +11,7 @@ const Birthday = () => {
   useEffect(() => {
     const getBirthdays = async () => {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.get("https://ediglobe-backend-main.onrender.com/employee/allemployees", {headers: {
+      const response = await axios.get(`${config.hostedUrl}/employee/allemployees`, {headers: {
         Authorization: token
       }});
       setBirthday(Array.isArray(response.data) ? response.data : []);
@@ -68,7 +69,7 @@ const Birthday = () => {
                 <img
                   className="relative w-24 h-24 mb-3 overflow-hidden rounded-full shadow-2xl shadow-white transition-transform duration-300 transform hover:scale-105"
                   src={item.Profile_img !== "Not Uploaded" ? item.Profile_img : nobirthday}
-                  alt="{`${item.Employee_Name} image`}"
+                  alt="Profile"
                 />
                 <h5 className="mb-1 text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-400 to-blue-500">
                   {item.Employee_Name.slice(0, 18)}
@@ -95,7 +96,7 @@ const Birthday = () => {
               <Typography variant="h3" className="mt-2">Birthday!</Typography>
             </div>
 
-            <img className="w-24 h-24 mb-3 rounded-full shadow-2xl shadow-white" src={nobirthday} alt="image" />
+            <img className="w-24 h-24 mb-3 rounded-full shadow-2xl shadow-white" src={nobirthday} alt="profile" />
             <span className='inline-flex items-center py-2 text-md font-bold'>
               No Birth Today! 😔
             </span>

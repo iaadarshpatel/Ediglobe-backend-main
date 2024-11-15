@@ -5,6 +5,7 @@ import './style.css';
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import { Card, Input, Typography, CardBody, Chip, } from "@material-tailwind/react";
 import useSWR from 'swr';
+import config from "../config.js";
 
 const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Amount Due", "Last Date", "Ob Form", "Domain", "Payment Status"];
 
@@ -29,7 +30,7 @@ const AllPayments = () => {
       Authorization: token
     }
   }).then((res) => res.json());
-  const { data, error } = useSWR(`https://ediglobe-backend-main.onrender.com/payment/allpayments/${Employee_Id}`, fetcher);
+  const { data, error } = useSWR(`${config.hostedUrl}/payment/allpayments/${Employee_Id}`, fetcher);
 
   const monthlySales = data?.monthlyCount || "Loading...";
   const totalObMonths = data?.totalMonths || [];

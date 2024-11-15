@@ -5,7 +5,9 @@ import { Card, CardBody, Input, Typography, Button, Chip, DialogBody, DialogFoot
 import { MagnifyingGlassIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid';
 import useSWR from 'swr';
 import SkeletonLoader from './SkeltonPgfl';
+import config from '../config.js';
 import axios from 'axios';
+import Page404 from './Page404';
 
 const statusOptions = [
   { value: '', label: 'Select Status' },
@@ -40,6 +42,7 @@ const LeadsDistribution = () => {
   const [matchedLeads, setMatchedLeads] = useState([]);
   const [disabledLeads, setDisabledLeads] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
+  // const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -47,21 +50,36 @@ const LeadsDistribution = () => {
 
   const employeeId = localStorage.getItem('employeeId');
   const token = localStorage.getItem("Access Token");
+
+  const handleNoteChange = (event, leadId) => {
+    const updatedNote = event.target.value;
+
+    setUpdatedLeads((prev) => ({
+      ...prev,
+      [leadId]: {
+        ...prev[leadId],
+        note: updatedNote,
+      },
+    }));
+  };
+
   const fetcher = (url) => fetch(url, {
     headers: {
-      Authorization: token,  
+      Authorization: token,
     }
   }).then((res) => res.json());
-  const { data, error } = useSWR('https://ediglobe-backend-main.onrender.com/leadsDistribute/pgfl', fetcher, {
+  const { data, error } = useSWR(`${config.hostedUrl}/leadsDistribute/pgfl`, fetcher, {
     refreshInterval: 4000,
   });
 
   const fetchMatchedLeads = async () => {
     try {
       const token = localStorage.getItem("Access Token");
-      const {data: leads } = await axios.get('https://ediglobe-backend-main.onrender.com/leads/fetchLeads',{headers: {
-        Authorization: token
-      }});
+      const { data: leads } = await axios.get(`${config.hostedUrl}/leads/fetchLeads`, {
+        headers: {
+          Authorization: token
+        }
+      });
       // Get the current employee ID from localStorage or other sources
       const employeeId = localStorage.getItem('employeeId');
 
@@ -78,7 +96,6 @@ const LeadsDistribution = () => {
         }
         return acc;
       }, {});
-
       setDisabledLeads(disabledLeadsMap);
 
       // Store the disabled leads in localStorage
@@ -118,20 +135,18 @@ const LeadsDistribution = () => {
     })
     : [];
 
-
   const handleStatusChange = (event, leadId) => {
-    const selectedStatus = event.target.value; // Get the selected value
-    const lead = filteredRows.find(row => row.id === leadId); // Find the lead
-
+    const selectedStatus = event.target.value;
+    const lead = filteredRows.find(row => row.id === leadId);
     if (lead) {
       const { employee_id, student_name, email, contact, course, year, college } = lead;
-
 
       setUpdatedLeads((prev) => {
         const newUpdatedLeads = {
           ...prev,
           [leadId]: {
-            status: selectedStatus, // Update status with the selected value
+            status: selectedStatus,
+            note: prev[leadId]?.note || '',
             employee_id,
             student_name,
             email,
@@ -141,14 +156,15 @@ const LeadsDistribution = () => {
             college,
           },
         };
+        console.log('Updated leads:', newUpdatedLeads);
+
         // Also update matchedLeads if needed
         // setMatchedLeads((prevLeads) =>
         //   prevLeads.map((lead) =>
         //     lead.id === leadId ? { ...lead, status: selectedStatus } : lead
         //   )
         // );
-
-        return newUpdatedLeads; // Return updated state
+        return newUpdatedLeads;
       });
     }
   };
@@ -183,9 +199,7 @@ const LeadsDistribution = () => {
     }
   }
 
-
   const handleSave = async () => {
-    // Check if any lead has "Select Status" as its status
     const invalidStatusLead = Object.values(updatedLeads).find(lead => lead.status === "Select Status");
     console.log("Invalid Status Lead:", invalidStatusLead);
 
@@ -193,12 +207,11 @@ const LeadsDistribution = () => {
       alert("Error: Please select a valid status for all leads before saving.");
       return;
     }
-
     // Get the current date and format it
     setSaving(true);
 
     // Prepare leads to save as an array
-    const leadsToSave = Object.entries(updatedLeads).map(([id, { employee_id, student_name, email, college, contact, course, year, status }]) => ({
+    const leadsToSave = Object.entries(updatedLeads).map(([id, { employee_id, student_name, email, college, contact, course, year, status, note }]) => ({
       id,
       employee_id,
       student_name,
@@ -208,17 +221,26 @@ const LeadsDistribution = () => {
       course,
       year,
       status,
+      note,
     }));
 
     try {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.post('https://ediglobe-backend-main.onrender.com/leads/updateLead', leadsToSave, {
+      const response = await axios.post(`${config.hostedUrl}/leads/updateLead`, leadsToSave, {
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json'
         }
       });
       alert("Saved successfully");
+      setUpdatedLeads((prev) => {
+        const resetLeads = { ...prev };
+        for (const key in resetLeads) {
+          resetLeads[key].note = ''; // Clear note for each lead
+        }
+        return resetLeads;
+      });
+
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Failed to update lead statuses';
       console.error('Error saving lead statuses:', errorMessage);
@@ -228,6 +250,7 @@ const LeadsDistribution = () => {
       setSaving(false);
     }
     fetchMatchedLeads();
+    console.log(leadsToSave);
   };
 
   const refreshData = async () => {
@@ -248,9 +271,7 @@ const LeadsDistribution = () => {
     await refreshData(); // Refresh data after saving
   };
 
-
-  if (error) return <div>Error loading data</div>;
-
+  if (error) return <div><Page404 /></div>;
 
   return (
     <>
@@ -270,7 +291,6 @@ const LeadsDistribution = () => {
                 <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Once lead status updated, cannot be change except "❌ DNP", "🕒 Busy", "📞 Disconnected", "🚫 Not Called Yet" or "🔄 Follow Up".<br />
                 <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Status should be updated for all the leads everyday before logout.<br />
               </Typography>
-
             </div>
 
             <Dialog
@@ -280,41 +300,54 @@ const LeadsDistribution = () => {
                 mount: { scale: 1, y: 0 },
                 unmount: { scale: 0.9, y: -100 },
               }}
-              className="max-w-4xl" // Increase horizontal size
+              className="w-50 max-w-xs sm:max-w-md md:max-w-3xl lg:max-w-5xl mx-2"
             >
-              <DialogHeader>Lead Details</DialogHeader>
-              <DialogBody className="max-h-[400px] overflow-y-auto"> {/* Set max height and enable Y-axis scroll */}
+              <DialogHeader className="text-base sm:text-lg md:text-xl">
+                PGFL Updated till Now:
+              </DialogHeader>
+              <DialogBody className="max-h-[500px] overflow-y-auto">
                 {matchedLeads.map((lead) => (
-                  <div key={lead.id} className="grid grid-cols-2 gap-4 mb-4"> {/* Grid with two columns */}
+                  <div
+                    key={lead.id}
+                    className="grid grid-cols-2 gap-4 mb-4 p-2 overflow-y-auto rounded-xl border border-gray-300 custom-shadow sm:grid-cols-2">
                     <div>
-                      <p className="font-semibold">Lead Id:</p>
-                      <p className="font-semibold">Student Name:</p>
-                      <p className="font-semibold">Email:</p>
-                      <p className="font-semibold">Contact:</p>
-                      <p className="font-semibold">Course:</p>
-                      <p className="font-semibold">Year:</p>
-                      <p className="font-semibold">College:</p>
-                      <p className="font-semibold">Status:</p>
-                      <p className="font-semibold">CreateAt:</p>
-                      <p className="font-semibold">UpdatedAt:</p>
+                      <p className="font-semibold text-sm sm:text-base">Lead Id:</p>
+                      <p className="font-semibold text-sm sm:text-base">Student Name:</p>
+                      <p className="font-semibold text-sm sm:text-base">Email:</p>
+                      <p className="font-semibold text-sm sm:text-base">Contact:</p>
+                      <p className="font-semibold text-sm sm:text-base">Course:</p>
+                      <p className="font-semibold text-sm sm:text-base">Year:</p>
+                      <p className="font-semibold text-sm sm:text-base">College:</p>
+                      <p className="font-semibold text-sm sm:text-base">Status:</p>
+                      <p className="font-semibold text-sm sm:text-base">Notes:</p>
+                      <p className="font-semibold text-sm sm:text-base">CreateAt:</p>
+                      <p className="font-semibold text-sm sm:text-base">UpdatedAt:</p>
                     </div>
                     <div>
-                      <p>{lead.id}</p>
-                      <p>{lead.student_name}</p>
-                      <p>{lead.email}</p>
-                      <p>{lead.contact}</p>
-                      <p>{lead.course}</p>
-                      <p>{lead.year}</p>
-                      <p>{lead.college}</p>
-                      <p>{lead.status}</p>
-                      <p>{lead.createdAt}</p>
-                      <p>{lead.updatedAt}</p>
+                      <p className="text-sm sm:text-base">{lead.id}</p>
+                      <p className="text-sm sm:text-base">{lead.student_name}</p>
+                      <p className="text-sm sm:text-base">{lead.email}</p>
+                      <p className="text-sm sm:text-base">{lead.contact}</p>
+                      <p className="text-sm sm:text-base">{lead.course}</p>
+                      <p className="text-sm sm:text-base">{lead.year}</p>
+                      <p className="text-sm sm:text-base">{lead.college}</p>
+                      <p className="font-normal text-sm sm:text-base text-blue-gray bg-gray-200 border border-black w-full sm:w-1/2 rounded-md px-2 border-2">
+                        {lead.status}
+                      </p>
+                      <p className="text-sm sm:text-base">
+                        {lead.note ? lead.note : "No Updates"}
+                      </p>
+                      <p className="text-sm sm:text-base">{lead.createdAt}</p>
+                      <p className="text-sm sm:text-base">{lead.updatedAt}</p>
                     </div>
                   </div>
                 ))}
               </DialogBody>
               <DialogFooter>
-                <Button className='bg-black text-white w-32' onClick={handleOpen}>
+                <Button
+                  className="bg-black text-white p-3 w-32"
+                  onClick={handleOpen}
+                >
                   <span>Cancel</span>
                 </Button>
               </DialogFooter>
@@ -369,7 +402,7 @@ const LeadsDistribution = () => {
                 ))}
               </select>
             </div>
-            
+
           </div>
 
           {/* Leads Table */}
@@ -420,73 +453,80 @@ const LeadsDistribution = () => {
                               <Typography variant="small" color="blue-gray" className="font-normal w-52">{college}</Typography>
                             </td>
                             <td className="p-4">
-                              <select
-                                className={`overflow-y-auto font-normal text-blue-gray bg-white border border-gray-300 rounded-md p-2 border-2 ${matchedLead ? 'opacity-50' : 'opacity-100'
-                                  }`}
-                                value={matchedLead ? matchedLead.status : status}
-                                onChange={(event) => handleStatusChange(event, id)} // Handle status change
-                                disabled={
-                                  (
-                                    matchedLead && // Select field should not be blank
-                                    matchedLead.status !== "Select Status" &&
-                                    !["DNP", "Busy", "Disconnected", "Not Called Yet", "Follow Up"].includes(
-                                      matchedLead.status // Disable only if it's not one of the allowed statuses
-                                    )
-                                  )
-                                }
-                              >
-                                {statusOptions.map((option) => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  className={`overflow-y-auto font-normal text-blue-gray bg-white border border-gray-300 rounded-md p-2 border-2 ${matchedLead ? 'opacity-50' : 'opacity-100'
+                                    }`}
+                                  value={matchedLead ? matchedLead.status : status}
+                                  onChange={(event) => handleStatusChange(event, id)} // Handle status change
+                                  disabled={
+                                    (
+                                      matchedLead && // Select field should not be blank
+                                      matchedLead.status !== "Select Status" &&
+                                      !["DNP", "Busy", "Disconnected", "Not Called Yet", "Follow Up"].includes(
+                                        matchedLead.status // Disable only if it's not one of the allowed statuses
+                                      )
+                                    )}>
+                                  {statusOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
 
-                              {(disabledLeads[id]) && (
-                                <div className="inline-flex items-center">
-                                  <Chip
-                                    value="Updated to db"
-                                    variant="ghost"
-                                    className='rounded-full bg-gray-800 normal-case text-white font-bold inline-block pt-2 ml-2 w-18'
+                                {(updatedLeads[id]?.status === "Follow Up" || updatedLeads[id]?.status === "Not Interested" || status === "Follow Up" || status === "Not Interested") && (
+                                  <textarea
+                                    className="w-24 h-8 text-sm p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                    placeholder="Note"
+                                    value={updatedLeads[id]?.note || ''}
+                                    onChange={(event) => handleNoteChange(event, id)}
                                   />
+                                )}
 
-                                  <Tooltip
-                                    placement="bottom"
-                                    className="border border-blue-gray-50 bg-black px-2 py-3 shadow-xl shadow-black/10"
-                                    content={
-                                      <div className="w-auto">
-                                        {matchedLead.createdAt && (
-                                          <Typography variant="small" className="text-xs text-white">
-                                            AssignedAt: {formatDate(new Date(matchedLead.createdAt))}
-                                          </Typography>
-                                        )}
-                                        {matchedLead.updatedAt && (
-                                          <Typography variant="small" className="text-xs text-white">
-                                            UpdatedAt: {formatDate(new Date(matchedLead.updatedAt))}
-                                          </Typography>
-                                        )}
-
-                                      </div>
-                                    }
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                      strokeWidth={2}
-                                      className="h-5 w-5 cursor-pointer text-blue-gray-500 ml-2" // Added margin-left for spacing
+                                {(disabledLeads[id]) && (
+                                  <div className="inline-flex items-center">
+                                    <Chip
+                                      value="Updated to db"
+                                      variant="ghost"
+                                      className='rounded-full bg-gray-800 normal-case text-white font-bold inline-block pt-2 ml-2 w-18'
+                                    />
+                                    <Tooltip
+                                      placement="bottom"
+                                      className="border border-blue-gray-50 bg-black px-2 py-3 shadow-xl shadow-black/10"
+                                      content={
+                                        <div className="w-auto">
+                                          {matchedLead.createdAt && (
+                                            <Typography variant="small" className="text-xs text-white">
+                                              AssignedAt: {formatDate(new Date(matchedLead.createdAt))}
+                                            </Typography>
+                                          )}
+                                          {matchedLead.updatedAt && (
+                                            <Typography variant="small" className="text-xs text-white">
+                                              UpdatedAt: {formatDate(new Date(matchedLead.updatedAt))}
+                                            </Typography>
+                                          )}
+                                        </div>
+                                      }
                                     >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                                      />
-                                    </svg>
-                                  </Tooltip>
-                                </div>
-                              )}
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                        className="h-5 w-5 cursor-pointer text-blue-gray-500 ml-2" // Added margin-left for spacing
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                                        />
+                                      </svg>
+                                    </Tooltip>
 
+                                  </div>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -497,7 +537,7 @@ const LeadsDistribution = () => {
                       </tr>
                     )
                   ) : (
-                    <SkeletonLoader count={8} />
+                    <SkeletonLoader count={10} />
                   )}
                 </tbody>
               </table>

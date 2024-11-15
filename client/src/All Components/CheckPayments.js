@@ -8,6 +8,7 @@ import Typewriter from 'typewriter-effect';
 import LottieFile from "./LottieFile";
 import useSWR from 'swr';
 import LoginToastMessage from "./LoginToastMessage";
+import config from "../config.js";
 
 const CheckPayments = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,9 +27,11 @@ const CheckPayments = () => {
             Authorization: token,
         },
     }).then((res) => res.json());
-  const { data, error: swrError } = useSWR('https://ediglobe-backend-main.onrender.com/paymentCount/payment/count', fetcher, {
-    refreshInterval: 4000,
-  });
+    const { data, error: swrError } = useSWR(`${config.hostedUrl}/paymentCount/payment/count`,fetcher,
+      {
+          refreshInterval: 4000,
+      }
+  );
 
   const postSalesCountNumber = data && typeof data.postSalesCount === 'number' ? data.postSalesCount : "Loading..";
   const salesCountNumber = data && typeof data.salesCount === 'number' ? data.salesCount : "Loading...";
@@ -60,7 +63,7 @@ const CheckPayments = () => {
 
     try {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.get(`https://ediglobe-backend-main.onrender.com/paymentCount/searchpayment/${query}`, {headers: {
+      const response = await axios.get(`${config.hostedUrl}/paymentCount/searchpayment/${query}`, {headers: {
         Authorization: token
       }});
       if (response.data) {

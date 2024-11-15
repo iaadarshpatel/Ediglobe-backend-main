@@ -60,7 +60,6 @@ const employeeAuth = async (req, res) => {
         const token = jwt.sign(
             { id: employee._id, employeeCode: employee.Employee_Id },
             process.env.JWT_SECRET_KEY, 
-            { expiresIn: '3h' } 
         );
 
         // Log the token to the console

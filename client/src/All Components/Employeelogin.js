@@ -7,6 +7,7 @@ import { LockClosedIcon, UserIcon } from "@heroicons/react/24/solid";
 import Lottie from 'react-lottie';
 import loti2 from '../assets/loti_file.json'
 import Typewriter from 'typewriter-effect';
+import config from "../config.js";
 import './style.css';
 
 
@@ -61,7 +62,7 @@ function Login() {
         }
 
         try {
-            const response = await axios.post('https://ediglobe-backend-main.onrender.com/employee/auth/login', { employeeCode, password });
+            const response = await axios.post(`${config.hostedUrl}/employee/auth/login`, { employeeCode, password });
 
             if (response.status === 200) {
                 const token = response.data.token;

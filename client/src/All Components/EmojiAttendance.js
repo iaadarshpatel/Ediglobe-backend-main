@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Typography, ListItem, Tooltip, Switch } from "@material-tailwind/react";
-import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock } from 'react-icons/fa';
+import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock, FaUserGraduate } from 'react-icons/fa';
 import { GiMoneyStack, GiWitchFlight } from 'react-icons/gi';
 import { MdPunchClock, MdSick } from 'react-icons/md';
 import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
+import config from "../config.js";
 
 const customColor = '#000000';
 
@@ -102,7 +103,7 @@ const EmojiAttendance = () => {
                 Authorization: token,
             },
         }).then((res) => res.json());
-    const { data, error } = useSWR('https://ediglobe-backend-main.onrender.com/attendanceDetails/attendance', fetcher, {
+    const { data, error } = useSWR(`${config.hostedUrl}/attendanceDetails/attendance`, fetcher, {
         refreshInterval: 4000,
         onSuccess: (fetchedData) => {
             localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
