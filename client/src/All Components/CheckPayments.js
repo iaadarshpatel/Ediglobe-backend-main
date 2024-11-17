@@ -189,7 +189,7 @@ const CheckPayments = () => {
                     </h1>
 
                     <div variant="small" className="font-normal opacity-80 py-4">
-                      <b style={{ color: "red", fontWeight: "bold", backgroundColor: "white" }}>Note:</b> <span>Enter payment ID, order ID, or Email. It only shows payment with the status <mark className="font-bold"> Captured </mark >.</span>
+                      <b style={{ color: "red", fontWeight: "bold", backgroundColor: "white" }}>Note:</b> <span>Enter payment ID, order ID, Phone Number or Email. It only shows payment with the status <mark className="font-bold"> Captured </mark >.</span>
                     </div>
 
                     <div className="mt-2">
