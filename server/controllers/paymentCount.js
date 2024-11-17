@@ -35,7 +35,8 @@ const paymentSearch = async (req, res) => {
             (payment) =>
                 payment.email === searchQuery ||
                 payment.id === searchQuery ||
-                payment.order_id === searchQuery
+                payment.order_id === searchQuery ||
+                payment.notes.contact_number === searchQuery
         );
 
         if (matchedPayment) {
