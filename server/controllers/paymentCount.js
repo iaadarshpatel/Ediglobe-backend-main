@@ -23,7 +23,7 @@ const fetchPaymentsBatch = async (pageSize, startingAfter = null) => {
 const paymentSearch = async (req, res) => {
     try {
         const pageSize = 100; // Define your page size
-        const { searchQuery } = req.params; // Extract the searchQuery from the URL
+        const { searchQuery } = req.params;
 
         const data = await fetchPaymentsBatch(pageSize);
         if (!data.items) {
