@@ -443,7 +443,7 @@ const LeadsDistribution = () => {
                             <td className="p-4">
                               <Typography variant="small" color="blue-gray" className="font-normal">
                                 <Link
-                                  to={`https://wa.me/${contact}`}
+                                  to={`https://api.whatsapp.com/send?phone=${contact}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-gray-500 hover:underline"
