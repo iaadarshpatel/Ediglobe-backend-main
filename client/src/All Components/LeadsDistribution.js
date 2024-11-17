@@ -8,6 +8,7 @@ import SkeletonLoader from './SkeltonPgfl';
 import config from '../config.js';
 import axios from 'axios';
 import Page404 from './Page404';
+import { Link } from 'react-router-dom';
 
 const statusOptions = [
   { value: '', label: 'Select Status' },
@@ -440,7 +441,16 @@ const LeadsDistribution = () => {
                               </div>
                             </td>
                             <td className="p-4">
-                              <Typography variant="small" color="blue-gray" className="font-normal">{contact}</Typography>
+                              <Typography variant="small" color="blue-gray" className="font-normal">
+                                <Link
+                                  to={`https://wa.me/${contact}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-gray-500 hover:underline"
+                                >
+                                  {contact}
+                                </Link>
+                              </Typography>
                             </td>
                             <td className="p-4">
                               <Chip variant="small" value={course} className="font-bold text-center text-white bg-black p-2.5">
