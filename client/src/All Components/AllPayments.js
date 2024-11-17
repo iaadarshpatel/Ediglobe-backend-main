@@ -367,7 +367,7 @@ const AllPayments = () => {
                               <Typography
                                 variant="small"
                                 color="blue-gray"
-                                className={`font-bold text-center border border-black rounded-md px-2 py-1 ${payment.payment_status === 'PAID' ? 'bg-green-500 text-white' :
+                                className={`font-bold text-xs text-center border border-black rounded-md px-2 py-1 ${payment.payment_status === 'PAID' ? 'bg-green-500 text-white' :
                                     payment.payment_status === 'NOT INTERESTED' ? 'bg-red-200 text-black' :
                                       payment.payment_status === 'NO RESPONSE' ? 'bg-yellow-200 text-black' :
                                         payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' : 
