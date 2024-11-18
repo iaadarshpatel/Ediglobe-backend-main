@@ -7,7 +7,7 @@ import { Card, Input, Typography, CardBody, Chip, } from "@material-tailwind/rea
 import useSWR from 'swr';
 import config from "../config.js";
 
-const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Amount Due", "Last Date", "Ob Form", "Domain", "Payment Status"];
+const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Partial Received", "Amount Due", "Last Date", "Ob Form", "Domain", "Payment Status"];
 
 const SkeletonRow = () => (
   <tr className="animate-pulse">
@@ -79,7 +79,7 @@ const AllPayments = () => {
   });
 
   function formatDateString(dateString) {
-    const normalizedDateString = dateString.replace('T', ' ').replace('Z', '');
+    const normalizedDateString = dateString.replace('T', ' ').replace('Z', ' ');
 
     // List of possible date formats
     const dateFormats = [
@@ -93,7 +93,7 @@ const AllPayments = () => {
       'DD/MM/YYYY HH:mm:ss',
       'DD/MM/YYYY',
       'MM/YYYY/DD',
-      'DD/MM/YYYY, HH:mm:ss', // Added support for this format
+      'DD/MM/YYYY, HH:mm:ss', 
     ];
 
     // Attempt to parse the date string using the recognized formats
@@ -116,7 +116,13 @@ const AllPayments = () => {
           date = new Date(`${parts[1]}-${parts[0]}-${parts[2]}`); // Convert to YYYY-MM-DD
           break;
         }
-      } else if (format === 'DD/MM/YYYY' || format === 'DD/MM/YYYY HH:mm:ss') {
+      }  else if (format === 'MM/DD/YYYY' || format === 'MM/DD/YYYY HH:mm:ss') {
+        if (parts.length === 3) {
+          date = new Date(`${parts[1]}-${parts[0]}-${parts[2]}`); // Convert to YYYY-MM-DD
+          break;
+        }
+      }
+      else if (format === 'DD/MM/YYYY') {
         if (parts.length === 3) {
           date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); // Convert to YYYY-MM-DD
           break;
@@ -140,7 +146,7 @@ const AllPayments = () => {
 
     // Console log the result in DD/MM/YYYY format
     const formattedDate = `${day}/${month}/${year}`;
-    return formattedDate; // Return the formatted date
+    return formattedDate; 
   }
 
   if (error) return <div>Error loading data</div>;
@@ -161,7 +167,6 @@ const AllPayments = () => {
                 This tab contains all the revenue details starting August'24 month.<br />
               </Typography>
             </div>
-
             <div className='pt-1 mb-2 flex flex-col items-center justify-between gap-4 md:flex-row'>
               <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold mt-1 flex items-center">
                 Daily Payments:
@@ -269,6 +274,7 @@ const AllPayments = () => {
                         const isLast = index === filteredPayments.length - 1;
                         const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
                         const formattedDate = formatDateString(payment.date);
+                        console.log(payment.date);
                         return (
                           <tr key={payment.Unique_Id}>
                             <td className={classes}>
@@ -325,6 +331,15 @@ const AllPayments = () => {
                                 className="font-normal"
                               >
                                 {payment.amount_paid}
+                              </Typography>
+                            </td>
+                            <td className={classes}>
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal"
+                              >
+                                {payment.partial_received}
                               </Typography>
                             </td>
                             <td className={classes}>
