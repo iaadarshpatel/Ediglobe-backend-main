@@ -3,6 +3,7 @@ import SideBar from './SideBar';
 import LottieFile from './LottieFile';
 import { Card, CardBody, Input, Typography, Button, Chip, DialogBody, DialogFooter, Dialog, DialogHeader, Tooltip } from '@material-tailwind/react';
 import { MagnifyingGlassIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+import { IoKeypadOutline } from "react-icons/io5";
 import useSWR from 'swr';
 import SkeletonLoader from './SkeltonPgfl';
 import config from '../config.js';
@@ -440,15 +441,23 @@ const LeadsDistribution = () => {
                                 </div>
                               </div>
                             </td>
+
                             <td className="p-4">
-                              <Typography variant="small" color="blue-gray" className="font-normal">
+                              <Typography variant="medium" color="blue-gray" className="font-normal flex items-center">
                                 <Link
                                   to={`https://api.whatsapp.com/send?phone=${contact}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-gray-500 hover:underline"
+                                  className="text-black-500 hover:underline flex items-center"
                                 >
                                   {contact}
+                                </Link>
+                                <Link
+                                  to="#"
+                                  onClick={() => window.location.href = `tel:${contact}`} // Trigger dialer
+                                  className="text-black hover:underline flex items-center sm:hidden md:invisible lg:invisible xl:invisible 2xl:invisible"
+                                >
+                                  <IoKeypadOutline className="ml-2 w-6 h-6" />
                                 </Link>
                               </Typography>
                             </td>

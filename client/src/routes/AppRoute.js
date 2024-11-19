@@ -14,6 +14,7 @@ import ProfileSection from '../All Components/Profile/ProfileSection';
 import DisplayProfile from '../All Components/Profile/DisplayProfile';
 import TeamTree from '../All Components/Team Structure/Tree';
 import TeamStructure from '../All Components/Team Structure/TeamStructure';
+import Map from '../All Components/Map';
 
 const AppRoute = () => {
 
@@ -37,6 +38,7 @@ const AppRoute = () => {
                     <Route path="/profile" element={<DisplayProfile />} />
                     <Route path="/team" element={<TeamTree />} />
                     <Route path="/teamStructure" element={<TeamStructure />} />
+                    <Route path="/Map" element={<Map />} />
                 </Routes>
             </BrowserRouter>
     );
