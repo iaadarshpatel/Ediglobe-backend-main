@@ -459,7 +459,7 @@ const LeadsDistribution = () => {
                               </div>
                             </td>
                             <td className="p-4">
-                              <Chip variant="small" value={course1} className="font-bold text-center text-white bg-black p-2.5">
+                              <Chip variant="small" value={course1} className="font-bold text-center text-white bg-black p-2.5 w-32 whitespace-normal break-words">
                               </Chip>
                             </td>
                             <td className="p-4">
