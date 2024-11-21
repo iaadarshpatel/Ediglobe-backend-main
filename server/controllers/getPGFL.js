@@ -6,7 +6,7 @@ dotenv.config();
 const getPGFL = async (req, res) => {
     try {
         const response = await axios.get(process.env.PGFL_API_URL);
-        const pgfl = response.data; // Assuming the API returns the desired data structure
+        const pgfl = response.data; 
         res.json(pgfl);
     } catch (error) {
         console.error('Error fetching PGFL records:', error);

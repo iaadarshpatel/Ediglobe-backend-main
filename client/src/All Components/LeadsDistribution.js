@@ -3,13 +3,11 @@ import SideBar from './SideBar';
 import LottieFile from './LottieFile';
 import { Card, CardBody, Input, Typography, Button, Chip, DialogBody, DialogFooter, Dialog, DialogHeader, Tooltip } from '@material-tailwind/react';
 import { MagnifyingGlassIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid';
-import { IoKeypadOutline } from "react-icons/io5";
 import useSWR from 'swr';
 import SkeletonLoader from './SkeltonPgfl';
 import config from '../config.js';
 import axios from 'axios';
 import Page404 from './Page404';
-import { Link } from 'react-router-dom';
 
 const statusOptions = [
   { value: '', label: 'Select Status' },
@@ -44,7 +42,6 @@ const LeadsDistribution = () => {
   const [matchedLeads, setMatchedLeads] = useState([]);
   const [disabledLeads, setDisabledLeads] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
-  // const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -141,7 +138,7 @@ const LeadsDistribution = () => {
     const selectedStatus = event.target.value;
     const lead = filteredRows.find(row => row.id === leadId);
     if (lead) {
-      const { employee_id, student_name, email, contact, course, year, college } = lead;
+      const { employee_id, student_name, email, contact1, contact2, course1, state, degree, graduation_year, college } = lead;
 
       setUpdatedLeads((prev) => {
         const newUpdatedLeads = {
@@ -152,9 +149,12 @@ const LeadsDistribution = () => {
             employee_id,
             student_name,
             email,
-            contact,
-            course,
-            year,
+            contact1,
+            contact2,
+            course1,
+            state,
+            degree,
+            graduation_year,
             college,
           },
         };
@@ -213,15 +213,18 @@ const LeadsDistribution = () => {
     setSaving(true);
 
     // Prepare leads to save as an array
-    const leadsToSave = Object.entries(updatedLeads).map(([id, { employee_id, student_name, email, college, contact, course, year, status, note }]) => ({
+    const leadsToSave = Object.entries(updatedLeads).map(([id, { employee_id, student_name, email, contact1, contact2, course1, state, degree, graduation_year, college, status, note }]) => ({
       id,
       employee_id,
       student_name,
       email,
-      contact,
+      contact1,
+      contact2,
+      course1,
+      state,
+      degree,
+      graduation_year,
       college,
-      course,
-      year,
       status,
       note,
     }));
@@ -316,10 +319,13 @@ const LeadsDistribution = () => {
                       <p className="font-semibold text-sm sm:text-base">Lead Id:</p>
                       <p className="font-semibold text-sm sm:text-base">Student Name:</p>
                       <p className="font-semibold text-sm sm:text-base">Email:</p>
-                      <p className="font-semibold text-sm sm:text-base">Contact:</p>
+                      <p className="font-semibold text-sm sm:text-base">Contact1:</p>
+                      <p className="font-semibold text-sm sm:text-base">Contact2:</p>
                       <p className="font-semibold text-sm sm:text-base">Course:</p>
-                      <p className="font-semibold text-sm sm:text-base">Year:</p>
                       <p className="font-semibold text-sm sm:text-base">College:</p>
+                      <p className="font-semibold text-sm sm:text-base">State:</p>
+                      <p className="font-semibold text-sm sm:text-base">Degree:</p>
+                      <p className="font-semibold text-sm sm:text-base">Graduation Year:</p>
                       <p className="font-semibold text-sm sm:text-base">Status:</p>
                       <p className="font-semibold text-sm sm:text-base">Notes:</p>
                       <p className="font-semibold text-sm sm:text-base">CreateAt:</p>
@@ -329,10 +335,13 @@ const LeadsDistribution = () => {
                       <p className="text-sm sm:text-base">{lead.id}</p>
                       <p className="text-sm sm:text-base">{lead.student_name}</p>
                       <p className="text-sm sm:text-base">{lead.email}</p>
-                      <p className="text-sm sm:text-base">{lead.contact}</p>
-                      <p className="text-sm sm:text-base">{lead.course}</p>
-                      <p className="text-sm sm:text-base">{lead.year}</p>
+                      <p className="text-sm sm:text-base">{lead.contact1}</p>
+                      <p className="text-sm sm:text-base">{lead.contact2}</p>
+                      <p className="text-sm sm:text-base">{lead.course1}</p>
                       <p className="text-sm sm:text-base">{lead.college}</p>
+                      <p className="text-sm sm:text-base">{lead.state}</p>
+                      <p className="text-sm sm:text-base">{lead.degree}</p>
+                      <p className="text-sm sm:text-base">{lead.graduation_year}</p>
                       <p className="font-normal text-sm sm:text-base text-blue-gray bg-gray-200 border border-black w-full sm:w-1/2 rounded-md px-2 border-2">
                         {lead.status}
                       </p>
@@ -413,7 +422,7 @@ const LeadsDistribution = () => {
               <table className="w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
-                    {["Student Name", "Contact", "Course Name", "State", "College", "Status"].map((head) => (
+                    {["Student Name", "Contacts", "Course", "College", "State", "Degree", "Graduation Year", "Status"].map((head) => (
                       <th key={head} className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
                         <Typography variant="small" className="font-bold leading-none text-black">
                           {head}
@@ -429,7 +438,7 @@ const LeadsDistribution = () => {
                     </tr>
                   ) : data ? (
                     filteredRows.length > 0 ? (
-                      filteredRows.map(({ student_name, email, contact, course, year, college, status, id }) => {
+                      filteredRows.map(({ student_name, email, contact1, contact2, course1, state, degree, graduation_year, college, status, id }) => {
                         const matchedLead = matchedLeads.find((lead) => lead.id === id);
                         return (
                           <tr key={id}>
@@ -441,35 +450,31 @@ const LeadsDistribution = () => {
                                 </div>
                               </div>
                             </td>
-
                             <td className="p-4">
-                              <Typography variant="medium" color="blue-gray" className="font-normal flex items-center">
-                                <Link
-                                  to={`https://api.whatsapp.com/send?phone=${contact}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-black-500 hover:underline flex items-center"
-                                >
-                                  {contact}
-                                </Link>
-                                <Link
-                                  to="#"
-                                  onClick={() => window.location.href = `tel:${contact}`} // Trigger dialer
-                                  className="text-black hover:underline flex items-center sm:hidden md:invisible lg:invisible xl:invisible 2xl:invisible"
-                                >
-                                  <IoKeypadOutline className="ml-2 w-6 h-6" />
-                                </Link>
-                              </Typography>
+                              <div className="flex items-center gap-3">
+                                <div className="flex flex-col">
+                                  <Typography variant="small" color="blue-gray" className="font-normal" onClick={() => window.location.href = `tel:${contact1}`}>{contact1}</Typography>
+                                  <Typography variant="small" color="blue-gray" className="font-normal opacity-70" onClick={() => window.location.href = `tel:${contact2}`}>{contact2}</Typography>
+                                </div>
+                              </div>
                             </td>
                             <td className="p-4">
-                              <Chip variant="small" value={course} className="font-bold text-center text-white bg-black p-2.5">
+                              <Chip variant="small" value={course1} className="font-bold text-center text-white bg-black p-2.5">
                               </Chip>
                             </td>
                             <td className="p-4">
-                              <Typography variant="small" color="blue-gray" className="font-normal">{year}</Typography>
+                              <Typography variant="small" color="blue-gray" className="font-normal w-48">{college}</Typography>
                             </td>
                             <td className="p-4">
-                              <Typography variant="small" color="blue-gray" className="font-normal w-52">{college}</Typography>
+                              <Typography variant="small" color='blue-gray' className="font-normal">{state}
+                              </Typography>
+                            </td>
+                            <td className="p-4">
+                              <Typography variant="small" color='blue-gray' className="font-normal">{degree}
+                              </Typography>
+                            </td>
+                            <td className="p-4">
+                              <Typography variant="small" color="blue-gray" className="font-normal">{graduation_year}</Typography>
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-2">

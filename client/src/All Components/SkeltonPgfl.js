@@ -24,6 +24,12 @@ const SkeletonLoader = ({ count }) => {
           <td className="p-4">
             <div className="h-6 bg-gray-300 rounded-md w-1/4"></div>
           </td>
+          <td className="p-4">
+            <div className="h-6 bg-gray-300 rounded-md w-1/4"></div>
+          </td>
+          <td className="p-4">
+            <div className="h-6 bg-gray-300 rounded-md w-1/4"></div>
+          </td>
         </tr>
       ))}
     </>
