@@ -11,6 +11,7 @@ import attendanceRoutes from "./routes/attendanceRoutes.js";
 import employeesRoutes from "./routes/employeesRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import paymentCountRoutes from "./routes/paymentCountRoutes.js"
+import attendanceLogsRoutes from "./routes/attendanceLogsRoutes.js";
 
 dotenv.config();
 
@@ -45,6 +46,9 @@ app.use('/payment', paymentRoutes);
 
 // Endpoint to get employee details by Employee_Id
 app.use('/employee', employeesRoutes)
+
+// Endpoint to get employee attendance by Employee_Id
+app.use('/logs', attendanceLogsRoutes)
 
 // Start the server
 const PORT = process.env.PORT || 3000;

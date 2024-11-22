@@ -293,7 +293,7 @@ const LeadsDistribution = () => {
               <Typography variant="sm" color="gray" className="font-normal text-blue-gray-500">
                 This tab contains urgent leads from the Potential Google Form (PGFL). Please prioritize contacting these leads immediately and ensure that their status is updated promptly and accurately.<br />
                 <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Click on Update Leads button to send their status to Admin<br />
-                <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Once lead status updated, cannot be change except "❌ DNP", "🕒 Busy", "📞 Disconnected", "🚫 Not Called Yet" or "🔄 Follow Up".<br />
+                <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Once lead status updated, cannot be change except "❌ DNP", "🕒 Busy", "📞 Disconnected", "🚫 Not Called Yet", "🔄 Follow Up" or "😐 Not Interested".<br />
                 <ArrowRightCircleIcon className="inline-block w-6 h-6 text-black" /> Status should be updated for all the leads everyday before logout.<br />
               </Typography>
             </div>
@@ -319,6 +319,7 @@ const LeadsDistribution = () => {
                       <p className="font-semibold text-sm sm:text-base">Lead Id:</p>
                       <p className="font-semibold text-sm sm:text-base">Student Name:</p>
                       <p className="font-semibold text-sm sm:text-base">Email:</p>
+                      <p className="font-semibold text-sm sm:text-base">Contact:</p>
                       <p className="font-semibold text-sm sm:text-base">Contact1:</p>
                       <p className="font-semibold text-sm sm:text-base">Contact2:</p>
                       <p className="font-semibold text-sm sm:text-base">Course:</p>
@@ -335,13 +336,15 @@ const LeadsDistribution = () => {
                       <p className="text-sm sm:text-base">{lead.id}</p>
                       <p className="text-sm sm:text-base">{lead.student_name}</p>
                       <p className="text-sm sm:text-base">{lead.email}</p>
+                      <p className="text-sm sm:text-base">
+                      {lead.contact ? lead.contact : "No Contact"}</p>
                       <p className="text-sm sm:text-base">{lead.contact1}</p>
                       <p className="text-sm sm:text-base">{lead.contact2}</p>
                       <p className="text-sm sm:text-base">{lead.course1}</p>
                       <p className="text-sm sm:text-base">{lead.college}</p>
                       <p className="text-sm sm:text-base">{lead.state}</p>
-                      <p className="text-sm sm:text-base">{lead.degree}</p>
-                      <p className="text-sm sm:text-base">{lead.graduation_year}</p>
+                      <p className="text-sm sm:text-base">{lead.degree ? lead.degree : "No Degree"}</p>
+                      <p className="text-sm sm:text-base">{lead.graduation_year ? lead.graduation_year : "No Graduation Year"}</p>
                       <p className="font-normal text-sm sm:text-base text-blue-gray bg-gray-200 border border-black w-full sm:w-1/2 rounded-md px-2 border-2">
                         {lead.status}
                       </p>
@@ -487,7 +490,7 @@ const LeadsDistribution = () => {
                                     (
                                       matchedLead && // Select field should not be blank
                                       matchedLead.status !== "Select Status" &&
-                                      !["DNP", "Busy", "Disconnected", "Not Called Yet", "Follow Up"].includes(
+                                      !["DNP", "Busy", "Disconnected", "Not Called Yet", "Follow Up", "Not Interested"].includes(
                                         matchedLead.status // Disable only if it's not one of the allowed statuses
                                       )
                                     )}>
@@ -557,7 +560,7 @@ const LeadsDistribution = () => {
                       })
                     ) : (
                       <tr>
-                        <td colSpan={6} className="text-center p-4">No leads found</td>
+                        <td colSpan={8} className="text-center p-4">No leads found</td>
                       </tr>
                     )
                   ) : (

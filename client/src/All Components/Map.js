@@ -1,149 +1,160 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import axios from "axios";
+import config from "../config.js";
 
-const mapContainerStyle = {
-  width: "100%",
-  height: "400px",
-  borderRadius: "15px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-};
-
-const options = {
-  disableDefaultUI: true, // Hides default controls
-  draggable: false, // Prevents map dragging
-  zoomControl: false, // Disables zoom control
-};
-
-const Login = () => {
-  const [location, setLocation] = useState(null);
+const ClockInOut = () => {
+  const [isClockedIn, setIsClockedIn] = useState(false);
+  const [clockInTime, setClockInTime] = useState(null);
   const [address, setAddress] = useState("");
-  const [dateTime, setDateTime] = useState("");
-  const [error, setError] = useState("");
+  const [todayDay, setTodayDay] = useState("");
+  const [logs, setLogs] = useState([]);
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog", // Replace with your API key
-  });
+  const formatDateTime = () => {
+    const date = new Date();
+    const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
+    setTodayDay(todayDate);
+};
 
-  const fetchLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ lat: latitude, lng: longitude });
-          fetchAddress(latitude, longitude);
-          setError("");
-        },
-        (err) => {
-          setError("Location access denied. Please enable location services.");
-        }
-      );
-    } else {
-      setError("Geolocation is not supported by this browser.");
+  useEffect(() => {
+    const savedClockInState = localStorage.getItem("isClockedIn");
+    const savedClockInTime = localStorage.getItem("clockInTime");
+    const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
+
+    if (savedClockInState === "true" && savedClockInTime) {
+      setIsClockedIn(true);
+      setClockInTime(new Date(savedClockInTime));
     }
-  };
-
-   // Custom Marker Style
-   const markerIcon = {
-    fillColor: "blue",  // Circle fill color
-    fillOpacity: 0.8,  // Circle fill opacity
-    strokeColor: "white",  // Circle border color
-    strokeWeight: 2,  // Circle border thickness
-    scale: 10,  // Circle size
-  };
-
+    setLogs(savedLogs);
+  }, []);
 
   const fetchAddress = async (lat, lng) => {
-    const API_KEY = "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog"; // Replace with your API key
+    const API_KEY = "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog";
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`;
     try {
       const response = await axios.get(url);
       const result = response.data;
-      if (result.results && result.results[0]) {
-        setAddress(result.results[0].formatted_address);
-      } else {
-        setAddress("Address not found.");
-      }
+      return result.results?.[0]?.formatted_address || "Address not found.";
     } catch (error) {
-      setAddress("Error fetching address.");
+      return "Error fetching address.";
     }
   };
 
-  const formatDateTime = () => {
-    const date = new Date();
+  const handleClockIn = async () => {
+    formatDateTime();
+    const currentTime = new Date();
+    setIsClockedIn(true);
+    setClockInTime(currentTime);
 
-    // Extract day, date, and time in the desired format
-    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-    const day = date.toLocaleDateString("en-US", options);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        const fetchedAddress = await fetchAddress(latitude, longitude);
+        setAddress(fetchedAddress);
 
-    // Combine everything in the required format
-    const formattedDateTime = `${time}, ${day}`;
-
-    setDateTime(formattedDateTime);
-  };
-
-  const handleClockIn = () => {
-    // Check if location and address are available
-    if (location && address) {
-      const clockInData = {
-        coordinates: location,
-        date: new Date().toLocaleDateString(),
-        time: dateTime,
-        address: address,
-      };
-
-      // Store the clock-in data in local storage
-      localStorage.setItem("clockInData", JSON.stringify(clockInData));
-      alert("Clocked In Successfully!");
+        localStorage.setItem("isClockedIn", "true");
+        localStorage.setItem("clockInTime", currentTime.toISOString());
+        localStorage.setItem("clockInAddress", fetchedAddress);
+      });
     } else {
-      alert("Please wait for location data to load.");
+      setAddress("Geolocation not supported.");
     }
   };
 
-  useEffect(() => {
-    // Update time every second
-    const intervalId = setInterval(formatDateTime, 1000);
+  const handleClockOut = async () => {
+    formatDateTime();
+    const employeeId = localStorage.getItem("employeeId");
+    const currentTime = new Date();
 
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, []);
+    let fetchedAddress = "Address not available";
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        fetchedAddress = await fetchAddress(latitude, longitude);
 
-  if (!isLoaded) return <div>Loading map...</div>;
+        const updatedLogs = [
+          ...logs,
+          {
+            clockIn: clockInTime.toISOString(),
+            clockOut: currentTime.toISOString(),
+            clockInAddress: address,
+            clockOutAddress: fetchedAddress,
+            attendanceMarkDate: todayDay,
+            employeeId,
+          },
+        ];
+
+        try {
+          const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost;`, updatedLogs, {
+            employeeId,
+            clockInTime: clockInTime.toISOString(),
+            clockOutTime: currentTime.toISOString(),
+            clockInAddress: address,
+            clockOutAddress: fetchedAddress,
+            attendanceMarkDate: todayDay
+          });
+          alert("Saved successfully");
+        } catch (error) {
+          console.error("Error saving logs:", error);
+        }
+
+        setLogs(updatedLogs);
+        setIsClockedIn(false);
+        setClockInTime(null);
+
+        localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
+        localStorage.removeItem("isClockedIn");
+        localStorage.removeItem("clockInTime");
+        localStorage.removeItem("clockInAddress");
+      });
+    }
+  };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <button onClick={fetchLocation}>Get Location</button>
-      {location && (
+    <div className="p-4 text-center">
+      {isClockedIn ? (
         <div>
-          {/* <p>
-            <strong>Coordinates:</strong> {location.lat}, {location.lng}
-          </p> */}
-          <p>
-            <strong>Address:</strong> {address}
-          </p>
-          <div style={mapContainerStyle}>
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={location}
-              zoom={15} // Set the zoom level
-              options={options}
-            >
-              <Marker icon={markerIcon} position={location} />
-            </GoogleMap>
-          </div>
-          <div>
-        <h3>Current Time and Date</h3>
-        <p>{dateTime}</p>
-      </div>
-          <button onClick={handleClockIn}>Clock In</button>
+          <h1>You are Clocked In</h1>
+          <p>Clock-In Time: {clockInTime?.toLocaleString()}</p>
+          <p>Clock-In Address: {address}</p>
+          <button
+            onClick={handleClockOut}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Clock Out
+          </button>
+        </div>
+      ) : (
+        <div>
+          <h1>You are Clocked Out</h1>
+          <button
+            onClick={handleClockIn}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Clock In
+          </button>
         </div>
       )}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      
+
+      <div className="mt-6">
+        <h2 className="text-lg font-bold">Clock-In/Out Logs</h2>
+        {logs.length > 0 ? (
+          <ul className="mt-4 text-left">
+            {logs.map((log, index) => (
+              <li key={index} className="py-1">
+                <strong>Clock-In:</strong> {new Date(log.clockIn).toLocaleString()} <br />
+                <strong>Clock-In Address:</strong> {log.clockInAddress} <br />
+                <strong>Clock-Out:</strong> {new Date(log.clockOut).toLocaleString()} <br />
+                <strong>Clock-Out Address:</strong> {log.clockOutAddress} <br />
+                <strong>Clock-Out Address:</strong> {log.attendanceMarkDate} <br />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No logs available yet.</p>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Login;
+export default ClockInOut;
