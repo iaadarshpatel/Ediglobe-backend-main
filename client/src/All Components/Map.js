@@ -12,17 +12,25 @@ const ClockInOut = () => {
   const formatDateTime = () => {
     const date = new Date();
     const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
-    setTodayDay(todayDate);
-};
+    return todayDate; // Return the formatted date
+  };
 
   useEffect(() => {
+    // Restore saved states from localStorage
     const savedClockInState = localStorage.getItem("isClockedIn");
     const savedClockInTime = localStorage.getItem("clockInTime");
+    const savedClockInAddress = localStorage.getItem("clockInAddress");
+    const savedAttendanceMarkDate = localStorage.getItem("attendanceMarkDate");
     const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
 
     if (savedClockInState === "true" && savedClockInTime) {
       setIsClockedIn(true);
       setClockInTime(new Date(savedClockInTime));
+      setAddress(savedClockInAddress || "Address not found.");
+      setTodayDay(savedAttendanceMarkDate || formatDateTime());
+    } else {
+      // If not clocked in, set todayDay
+      setTodayDay(savedAttendanceMarkDate || formatDateTime());
     }
     setLogs(savedLogs);
   }, []);
@@ -40,10 +48,12 @@ const ClockInOut = () => {
   };
 
   const handleClockIn = async () => {
-    formatDateTime();
     const currentTime = new Date();
+    const formattedDate = formatDateTime();
+
     setIsClockedIn(true);
     setClockInTime(currentTime);
+    setTodayDay(formattedDate);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -51,9 +61,11 @@ const ClockInOut = () => {
         const fetchedAddress = await fetchAddress(latitude, longitude);
         setAddress(fetchedAddress);
 
+        // Save to localStorage
         localStorage.setItem("isClockedIn", "true");
         localStorage.setItem("clockInTime", currentTime.toISOString());
         localStorage.setItem("clockInAddress", fetchedAddress);
+        localStorage.setItem("attendanceMarkDate", formattedDate);
       });
     } else {
       setAddress("Geolocation not supported.");
@@ -61,7 +73,6 @@ const ClockInOut = () => {
   };
 
   const handleClockOut = async () => {
-    formatDateTime();
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
 
@@ -74,8 +85,8 @@ const ClockInOut = () => {
         const updatedLogs = [
           ...logs,
           {
-            clockIn: clockInTime.toISOString(),
-            clockOut: currentTime.toISOString(),
+            clockInTime: clockInTime.toLocaleString(),
+            clockOutTime: currentTime.toLocaleString(),
             clockInAddress: address,
             clockOutAddress: fetchedAddress,
             attendanceMarkDate: todayDay,
@@ -84,14 +95,14 @@ const ClockInOut = () => {
         ];
 
         try {
-          const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost;`, updatedLogs, {
-            employeeId,
-            clockInTime: clockInTime.toISOString(),
-            clockOutTime: currentTime.toISOString(),
-            clockInAddress: address,
-            clockOutAddress: fetchedAddress,
-            attendanceMarkDate: todayDay
+          const token = localStorage.getItem("Access Token");
+          const response = await axios.post("http://localhost:3003/logs/attendanceLogsPost", updatedLogs, {
+            headers: {
+              Authorization: token,
+              "Content-Type": "application/json",
+            },
           });
+          console.log("Response from API:", response);
           alert("Saved successfully");
         } catch (error) {
           console.error("Error saving logs:", error);
@@ -101,10 +112,14 @@ const ClockInOut = () => {
         setIsClockedIn(false);
         setClockInTime(null);
 
+        // Update localStorage
         localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         localStorage.removeItem("isClockedIn");
         localStorage.removeItem("clockInTime");
         localStorage.removeItem("clockInAddress");
+        localStorage.removeItem("attendanceMarkDate");
+        localStorage.removeItem("address");
+        localStorage.removeItem("clockLogs");
       });
     }
   };
@@ -137,7 +152,7 @@ const ClockInOut = () => {
 
       <div className="mt-6">
         <h2 className="text-lg font-bold">Clock-In/Out Logs</h2>
-        {logs.length > 0 ? (
+        {/* {logs.length > 0 ? (
           <ul className="mt-4 text-left">
             {logs.map((log, index) => (
               <li key={index} className="py-1">
@@ -145,13 +160,13 @@ const ClockInOut = () => {
                 <strong>Clock-In Address:</strong> {log.clockInAddress} <br />
                 <strong>Clock-Out:</strong> {new Date(log.clockOut).toLocaleString()} <br />
                 <strong>Clock-Out Address:</strong> {log.clockOutAddress} <br />
-                <strong>Clock-Out Address:</strong> {log.attendanceMarkDate} <br />
+                <strong>Attendance Date:</strong> {log.attendanceMarkDate} <br />
               </li>
             ))}
           </ul>
         ) : (
           <p>No logs available yet.</p>
-        )}
+        )} */}
       </div>
     </div>
   );

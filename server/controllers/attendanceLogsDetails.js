@@ -1,47 +1,51 @@
 import AttendanceLogs from "../models/AttendanceLogs.js";
 
-
-// Insert attendance log for clock-in and clock-out
 const attendanceLogsInsert = async (req, res) => {
-    const { Employee_Id, clockIn, clockInAddress, clockOut, clockOutAddress, attendanceMarkDate } = req.body;
-    console.log("Received attendance log data:", req.body);
-    
+    const { Employee_Id, clockInTime, clockInAddress, clockOutTime, clockOutAddress, attendanceMarkDate } = req.body;
+
     try {
-        // If clockOut is not provided, it's a clock-in action
-        if (!clockOut) {
+        console.log("Inserting/updating attendance log...");
+        
+        if (!clockOutTime) {
+            // Clock-in logic
+            console.log("Clock-in request received.");
             const newLog = new AttendanceLogs({
                 Employee_Id,
-                clockInTime: clockIn, 
-                clockOutTime: null, // Null as clock-out time will be updated later
-                attendanceMarkDate: attendanceMarkDate || new Date().toISOString().split("T")[0], // Use provided date or default to today
-                clockInAddress // Address when clocking in
+                clockInTime: clockInTime,
+                clockInAddress,
+                attendanceMarkDate,
             });
-
+            console.log("New log created:", newLog);
+            
             await newLog.save();
             return res.status(201).json({ message: "Clock-in successful", log: newLog });
         } else {
-            // If clockOut is provided, update the existing clock-in log with clock-out time
+            // Clock-out logic
+            console.log("Clock-out request received.");
             const updatedLog = await AttendanceLogs.findOneAndUpdate(
-                { Employee_Id, clockOutTime: null }, // Find the latest clock-in log without clock-out
                 { 
-                    $set: { 
-                        clockOutTime: clockOut, // Update with clock-out time
-                        clockOutAddress // Update clock-out address
-                    }
+                    Employee_Id, 
+                    clockOutTime: null, // Ensure this log hasn't already been clocked out
+                    attendanceMarkDate, // Ensure the log matches the same date
                 },
-                { new: true } // Return the updated document
+                {
+                    $set: {
+                        clockOutTime: clockOutTime,
+                        clockOutAddress,
+                    },
+                },
+                { new: true }
             );
-
             if (updatedLog) {
                 return res.status(200).json({ message: "Clock-out successful", log: updatedLog });
             } else {
-                return res.status(404).json({ error: "No active clock-in log found for this employee" });
+                return res.status(404).json({ error: "No active clock-in log found for this employee. Please clock in first." });
             }
         }
     } catch (error) {
+        console.error("Error inserting/updating attendance log:", error);
         return res.status(500).json({ error: "Failed to insert/update attendance log", details: error.message });
     }
 };
 
-
-export default attendanceLogsInsert ;
+export default attendanceLogsInsert;

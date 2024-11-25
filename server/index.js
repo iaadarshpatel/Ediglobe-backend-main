@@ -1,7 +1,5 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
-import createUserModel from "./models/Users.js";
 import dotenv from "dotenv";
 import bodyParser from 'body-parser';
 import connectDb from "./config/Db.js";
@@ -12,6 +10,7 @@ import employeesRoutes from "./routes/employeesRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import paymentCountRoutes from "./routes/paymentCountRoutes.js"
 import attendanceLogsRoutes from "./routes/attendanceLogsRoutes.js";
+import authenticate from "./middleware/authenticate.js";
 
 dotenv.config();
 
@@ -19,11 +18,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(authenticate);
 
 connectDb();
 
-// Create the UserModel using the mongoose connection
-const UserModel = createUserModel(mongoose.connection);
 
 app.get('/', async(req, res) => {
     res.send("Working!");

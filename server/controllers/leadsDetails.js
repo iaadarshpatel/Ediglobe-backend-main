@@ -4,7 +4,6 @@ const fetchLeadsDetails = async (req, res) => {
     console.log('Fetching leads...');
     try {
         const leads = await LeadList.find(); // Fetch all leads from the database
-        console.log('Fetched leads:', leads);
         res.json(leads); // Send the leads back in the response
     } catch (err) {
         console.error('Error fetching leads:', err);
