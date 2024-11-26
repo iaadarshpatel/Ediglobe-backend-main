@@ -8,6 +8,7 @@ const ClockInOut = () => {
   const [address, setAddress] = useState("");
   const [todayDay, setTodayDay] = useState("");
   const [logs, setLogs] = useState([]);
+  const [updatedAttendanceLogs, setUpdatedAttendanceLogs] = useState([]);
 
   const formatDateTime = () => {
     const date = new Date();
@@ -48,6 +49,7 @@ const ClockInOut = () => {
   };
 
   const handleClockIn = async () => {
+    const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
     const formattedDate = formatDateTime();
 
@@ -66,6 +68,45 @@ const ClockInOut = () => {
         localStorage.setItem("clockInTime", currentTime.toISOString());
         localStorage.setItem("clockInAddress", fetchedAddress);
         localStorage.setItem("attendanceMarkDate", formattedDate);
+
+        // Create the log object
+        const clockInlog = {
+          clockInTime: currentTime.toLocaleString(),
+          clockInAddress: fetchedAddress,
+          attendanceMarkDate: formattedDate,
+          employeeId,
+        };
+
+        try {
+          const token = localStorage.getItem("Access Token");
+          const response = await axios
+            .post(`${config.hostedUrl}/logs/attendanceLogsPost`, clockInlog, {
+              headers: {
+                Authorization: token,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((res) => res.data)
+            .catch((error) => {
+              console.error("Error saving log:", error);
+              throw error; // Rethrow to catch it in the outer block
+            });
+
+          console.log("Response from API:", response);
+          alert("Saved successfully");
+
+          // Update the logs array locally after successful post
+          const updatedLogs = [...logs, clockInlog];
+          setLogs(updatedLogs);
+          setUpdatedAttendanceLogs(updatedLogs);
+
+          // Update localStorage
+          localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
+        } catch (error) {
+          console.error("Error saving log:", error);
+          alert("Failed to save log. Please try again.");
+        }
+
       });
     } else {
       setAddress("Geolocation not supported.");
@@ -77,52 +118,67 @@ const ClockInOut = () => {
     const currentTime = new Date();
 
     let fetchedAddress = "Address not available";
-    if (navigator.geolocation) {
+     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         fetchedAddress = await fetchAddress(latitude, longitude);
 
-        const updatedLogs = [
-          ...logs,
-          {
-            clockInTime: clockInTime.toLocaleString(),
-            clockOutTime: currentTime.toLocaleString(),
-            clockInAddress: address,
-            clockOutAddress: fetchedAddress,
-            attendanceMarkDate: todayDay,
-            employeeId,
-          },
-        ];
+        // Create the latest log object
+        const newLog = {
+          clockInTime: clockInTime.toLocaleString(),
+          clockOutTime: currentTime.toLocaleString(),
+          clockInAddress: address,
+          clockOutAddress: fetchedAddress,
+          attendanceMarkDate: todayDay,
+          employeeId,
+        };
 
         try {
           const token = localStorage.getItem("Access Token");
-          const response = await axios.post("http://localhost:3003/logs/attendanceLogsPost", updatedLogs, {
-            headers: {
-              Authorization: token,
-              "Content-Type": "application/json",
-            },
-          });
+          console.log("Sending log to API:", newLog);
+
+          // Send only the new log object in the POST request
+          const response = await axios
+            .post(`${config.hostedUrl}/logs/attendanceLogsPost`, newLog, {
+              headers: {
+                Authorization: token,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((res) => res.data)
+            .catch((error) => {
+              console.error("Error saving log:", error);
+              throw error; // Rethrow to catch it in the outer block
+            });
+
           console.log("Response from API:", response);
           alert("Saved successfully");
+
+          // Update the logs array locally after successful post
+          const updatedLogs = [...logs, newLog];
+          setLogs(updatedLogs);
+          setUpdatedAttendanceLogs(updatedLogs);
+
+          // Update localStorage
+          localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         } catch (error) {
-          console.error("Error saving logs:", error);
+          console.error("Error saving log:", error);
+          alert("Failed to save log. Please try again.");
         }
 
-        setLogs(updatedLogs);
+        // Reset state after logging out
         setIsClockedIn(false);
         setClockInTime(null);
-
-        // Update localStorage
-        localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         localStorage.removeItem("isClockedIn");
         localStorage.removeItem("clockInTime");
         localStorage.removeItem("clockInAddress");
+        localStorage.removeItem("clockLogs");
         localStorage.removeItem("attendanceMarkDate");
         localStorage.removeItem("address");
-        localStorage.removeItem("clockLogs");
       });
     }
   };
+
 
   return (
     <div className="p-4 text-center">
@@ -152,13 +208,13 @@ const ClockInOut = () => {
 
       <div className="mt-6">
         <h2 className="text-lg font-bold">Clock-In/Out Logs</h2>
-        {/* {logs.length > 0 ? (
+        {updatedAttendanceLogs.length > 0 ? (
           <ul className="mt-4 text-left">
-            {logs.map((log, index) => (
+            {updatedAttendanceLogs.map((log, index) => (
               <li key={index} className="py-1">
-                <strong>Clock-In:</strong> {new Date(log.clockIn).toLocaleString()} <br />
+                <strong>Clock-In:</strong> {log.clockInTime} <br />
                 <strong>Clock-In Address:</strong> {log.clockInAddress} <br />
-                <strong>Clock-Out:</strong> {new Date(log.clockOut).toLocaleString()} <br />
+                <strong>Clock-Out:</strong> {log.clockOutTime} <br />
                 <strong>Clock-Out Address:</strong> {log.clockOutAddress} <br />
                 <strong>Attendance Date:</strong> {log.attendanceMarkDate} <br />
               </li>
@@ -166,7 +222,7 @@ const ClockInOut = () => {
           </ul>
         ) : (
           <p>No logs available yet.</p>
-        )} */}
+        )}
       </div>
     </div>
   );

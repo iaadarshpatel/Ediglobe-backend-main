@@ -1,17 +1,14 @@
 import AttendanceLogs from "../models/AttendanceLogs.js";
 
 const attendanceLogsInsert = async (req, res) => {
-    const { Employee_Id, clockInTime, clockInAddress, clockOutTime, clockOutAddress, attendanceMarkDate } = req.body;
-
+    const { employeeId, clockInTime, clockInAddress, clockOutTime, clockOutAddress, attendanceMarkDate } = req.body;
+    console.log(req.body);
     try {
-        console.log("Inserting/updating attendance log...");
-        
         if (!clockOutTime) {
-            // Clock-in logic
             console.log("Clock-in request received.");
             const newLog = new AttendanceLogs({
-                Employee_Id,
-                clockInTime: clockInTime,
+                Employee_Id: employeeId,
+                clockInTime,
                 clockInAddress,
                 attendanceMarkDate,
             });
@@ -24,7 +21,7 @@ const attendanceLogsInsert = async (req, res) => {
             console.log("Clock-out request received.");
             const updatedLog = await AttendanceLogs.findOneAndUpdate(
                 { 
-                    Employee_Id, 
+                    Employee_Id: employeeId, 
                     clockOutTime: null, // Ensure this log hasn't already been clocked out
                     attendanceMarkDate, // Ensure the log matches the same date
                 },

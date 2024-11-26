@@ -10,7 +10,6 @@ import employeesRoutes from "./routes/employeesRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import paymentCountRoutes from "./routes/paymentCountRoutes.js"
 import attendanceLogsRoutes from "./routes/attendanceLogsRoutes.js";
-import authenticate from "./middleware/authenticate.js";
 
 dotenv.config();
 
@@ -19,7 +18,6 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(authenticate);
 
 connectDb();
 

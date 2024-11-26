@@ -31,7 +31,7 @@ const employeeFetch = async (req, res) => {
 
 const employeeAuth = async (req, res) => {
     const { employeeCode, password } = req.body;
-
+    console.log(req.body);
     if (!employeeCode || !password) {
         return res.status(400).json({ error: 'Employee Code and Password are required' });
     }
