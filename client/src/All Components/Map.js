@@ -172,9 +172,9 @@ const ClockInOut = () => {
         localStorage.removeItem("isClockedIn");
         localStorage.removeItem("clockInTime");
         localStorage.removeItem("clockInAddress");
-        localStorage.removeItem("clockLogs");
         localStorage.removeItem("attendanceMarkDate");
         localStorage.removeItem("address");
+        localStorage.removeItem("clockLogs");
       });
     }
   };
@@ -182,6 +182,7 @@ const ClockInOut = () => {
 
   return (
     <div className="p-4 text-center">
+    
       {isClockedIn ? (
         <div>
           <h1>You are Clocked In</h1>

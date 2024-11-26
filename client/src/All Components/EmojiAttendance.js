@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Typography, ListItem, Tooltip, Switch, Button, Card } from "@material-tailwind/react";
-import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock, FaIdCard  } from 'react-icons/fa';
+import { Typography, ListItem, Switch, Button, Card } from "@material-tailwind/react";
+import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock } from 'react-icons/fa';
 import { GiMoneyStack, GiWitchFlight } from 'react-icons/gi';
-import { IoIosArrowForward } from "react-icons/io";
+import { BsClockHistory } from "react-icons/bs";
+import { CalendarDateRangeIcon, PencilSquareIcon, ClockIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid'
 import { MdPunchClock, MdSick } from 'react-icons/md';
 import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
@@ -210,109 +211,95 @@ const EmojiAttendance = () => {
 
     return (
         <div className="w-full px-4">
-            <div className="flex justify-between p-3 mb-3 bg-blue-gray-50 rounded-border">
+            <div className="flex flex-col lg:flex-row justify-between p-3 mb-3 bg-blue-gray-50 rounded-border">
                 {/* Left Section */}
-                <div className="w-1/2">
+                <div className="w-full lg:w-1/2 mb-3 lg:mb-0">
                     <div className="mb-1 flex items-center gap-3">
                         <Typography
                             variant="md"
                             color="blue-gray"
                             className="font-bold transition-colors hover:text-gray-900"
-                        >Attendance Overview:
-                        </Typography>
-                        <Tooltip
-                            placement="bottom"
-                            className="inline-flex border border-blue-gray-50 bg-black text-white px-4 py-3 shadow-xl shadow-black/10"
-                            content={
-                                <div className="w-80">
-                                    <Typography
-                                        variant="medium"
-                                        color="white"
-                                        className="font-normal opacity-80"
-                                    >
-                                        Please connect with HR for any issues 🙂
-                                    </Typography>
-                                </div>
-                            }
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                className="h-5 w-5 cursor-pointer text-blue-gray-500 inline"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                                />
-                            </svg>
-                        </Tooltip>
+                            Attendance Overview:
+                        </Typography>
                     </div>
                     <Typography
                         variant="sm"
-                        color="gray"
+                        color="gray-500"
                         className="font-normal text-blue-gray-500"
-                    >Attendance details are listed in the tab. For corrections, please contact HR.
+                    >
+                        Attendance details are listed in the tab. For corrections, please contact HR.
                     </Typography>
-                    <div className="m-1 flex items-center gap-5">
-                        <div className="flex items-center gap-1">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                className="-mt-px h-4 w-4 text-green-500"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
+                    <div className="flex flex-col items-start gap-2 mt-1">
+                    <div className="flex items-center gap-2">
+                            <ClipboardDocumentCheckIcon className="h-5 w-5 text-black" />
                             <Typography
                                 color="gray"
-                                className="text-xs font-medium text-blue-gray-500"
+                                className="text-sm font-normal text-blue-gray-500"
                             >
-                                Verified from HR
+                                Attendance <span className="text-indigo-800 font-semibold">recorded</span> daily
+                            </Typography>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <PencilSquareIcon className="h-5 w-5 text-black" />
+                            <Typography
+                                color="gray"
+                                className="text-sm font-normal text-blue-gray-500"
+                            >
+                                Request <span className="text-yellow-800 font-semibold">corrections</span> from HR
+                            </Typography>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <CalendarDateRangeIcon className="h-5 w-5 text-black" />
+                            <Typography
+                                color="gray"
+                                className="text-sm font-normal text-blue-gray-500"
+                            >
+                                Check attendance <span className="text-purple-800 font-semibold">date-wise</span> using the calendar
+                            </Typography>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <ClockIcon className="h-5 w-5 text-black" />
+                            <Typography
+                                color="gray"
+                                className="text-sm font-normal text-blue-gray-500"
+                            >
+                                Clock <span className="text-green-800 font-semibold">In</span> and <span className="text-red-800 font-semibold">Out</span> available <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">New</span>
                             </Typography>
                         </div>
                     </div>
                 </div>
                 {/* Right Section */}
-                <div className="w-1/2 flex justify-end">
-                    <Card className="w-3/5 rounded-lg border border-gray-300 py-2 px-3">
-                    <Typography className="mb-1 text-gray-600 text-xs font-normal">GENERAL SHIFT (11:30 AM - 08:30 PM)</Typography>
-                        <div className="mb-2 flex items-start justify-between">
+                <div className="w-full lg:w-1/2 flex justify-end">
+                    <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
+                        <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
+                            GENERAL SHIFT (11:30 AM - 08:30 PM)
+                            <h1 className="text-sm font-bold text-red-800 border border-gray-400 rounded-lg p-1">Clocked Out</h1>
+                        </Typography>
+                        <div className="mb-1 flex items-start justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="bg-white border border-gray-400 p-1.5 rounded-lg">
-                                    <FaIdCard className="h-6 w-6 text-black" />
+                                <div className="bg-white">
+                                <BsClockHistory className="h-7 w-7 text-black" />
                                 </div>
-                                <div className="flex">
-                                    <Typography variant="medium" color="blue-gray" className="font-bold">
-                                        {todayDate}
-                                    </Typography>
-                                    <Typography variant="medium" color="gray" className="font-bold pl-2">
-                                        {todayDay}
-                                    </Typography>
-                                </div>
-                                <div>
-                                    <IoIosArrowForward/>
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex">
+                                        <Typography variant="medium" color="blue-gray" className="font-bold">
+                                            {todayDate}
+                                        </Typography>
+                                        <Typography variant="medium" color="gray" className="font-bold pl-1">
+                                            {todayDay}
+                                        </Typography>
+                                    </div>
+                                    <div className="flex">
+                                        <Typography className="text-sm !font-medium !text-gray-600">
+                                            Worked for: <span className="font-bold text-black"> 0 / 8 Hrs</span>
+                                        </Typography>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <div className="flex gap-1">
-                                <Typography className="mb-1 text-sm !font-medium !text-gray-600">
-                                    Worked for:
-                                </Typography>
-                                <Typography className="text-sm !font-bold" color="blue-gray">
-                                    0 / 8 Hrs
-                                </Typography>
-                            </div>
-                        </div>
-                        <Button className="bg-green-700">Clock In</Button>
+                        <Typography className="text-sm !font-bold !text-black">Clock-<span className="text-green-500 font-semibold">In</span> Time: <span className="text-red-500 font-semibold"> Clocked Out</span></Typography> 
+                        <Button className="bg-green-700 mt-1 w-full lg:w-auto mb-0">Clock In</Button>
                     </Card>
                 </div>
             </div>
@@ -345,7 +332,7 @@ const EmojiAttendance = () => {
                             </Typography>
                         </div>
                     }
-                        className={`${isVisible ? 'bg-black' : 'bg-gray-500'}`}
+                        className={`${isVisible ? 'bg-teal-500' : 'bg-red-500'}`}
                         onChange={toggleVisibility}
                         checked={isVisible}
                     />
