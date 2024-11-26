@@ -9,6 +9,11 @@ const ClockInOut = () => {
   const [todayDay, setTodayDay] = useState("");
   const [logs, setLogs] = useState([]);
   const [updatedAttendanceLogs, setUpdatedAttendanceLogs] = useState([]);
+  const [clockInLatitude, setClockInLatitude] = useState(null);
+  const [clockInLongitude, setClockInLongitude] = useState(null);
+  const [clockOutLatitude, setClockOutLatitude] = useState(null);
+  const [clockOutLongitude, setClockOutLongitude] = useState(null);
+
 
   const formatDateTime = () => {
     const date = new Date();
@@ -52,31 +57,38 @@ const ClockInOut = () => {
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
     const formattedDate = formatDateTime();
-
+  
     setIsClockedIn(true);
     setClockInTime(currentTime);
     setTodayDay(formattedDate);
-
+  
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         const fetchedAddress = await fetchAddress(latitude, longitude);
         setAddress(fetchedAddress);
-
-        // Save to localStorage
+        setClockInLatitude(latitude);  
+        setClockInLongitude(longitude);  
+  
+        // Save to localStorage after updating the state values
         localStorage.setItem("isClockedIn", "true");
         localStorage.setItem("clockInTime", currentTime.toISOString());
         localStorage.setItem("clockInAddress", fetchedAddress);
         localStorage.setItem("attendanceMarkDate", formattedDate);
-
+        localStorage.setItem("clockInLatitude", latitude);  
+        localStorage.setItem("clockInLongitude", longitude);  
+        
+  
         // Create the log object
         const clockInlog = {
           clockInTime: currentTime.toLocaleString(),
           clockInAddress: fetchedAddress,
+          clockInLatitude: latitude,  
+          clockInLongitude: longitude,  
           attendanceMarkDate: formattedDate,
           employeeId,
         };
-
+        console.log("Clock-in logs:", clockInlog);
         try {
           const token = localStorage.getItem("Access Token");
           const response = await axios
@@ -89,55 +101,61 @@ const ClockInOut = () => {
             .then((res) => res.data)
             .catch((error) => {
               console.error("Error saving log:", error);
-              throw error; // Rethrow to catch it in the outer block
+              throw error;
             });
-
           console.log("Response from API:", response);
           alert("Saved successfully");
-
+  
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, clockInlog];
           setLogs(updatedLogs);
           setUpdatedAttendanceLogs(updatedLogs);
-
-          // Update localStorage
+  
+          // Update localStorage with the new logs array
           localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         } catch (error) {
           console.error("Error saving log:", error);
           alert("Failed to save log. Please try again.");
         }
-
       });
     } else {
       setAddress("Geolocation not supported.");
     }
   };
-
+  
   const handleClockOut = async () => {
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
-
     let fetchedAddress = "Address not available";
-     if (navigator.geolocation) {
+  
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         fetchedAddress = await fetchAddress(latitude, longitude);
-
-        // Create the latest log object
+  
+        // Set the clock-out latitude and longitude in the state
+        setClockOutLatitude(latitude);
+        setClockOutLongitude(longitude);
+  
+        // Create the latest log object including clock-out information
         const newLog = {
-          clockInTime: clockInTime.toLocaleString(),
+          clockInTime: clockInTime?.toLocaleString(), 
           clockOutTime: currentTime.toLocaleString(),
-          clockInAddress: address,
-          clockOutAddress: fetchedAddress,
+          clockInAddress: address, 
+          clockOutAddress: fetchedAddress, 
+          clockInLatitude: clockInLatitude,  
+          clockInLongitude: clockInLongitude,  
+          clockOutLatitude: latitude, 
+          clockOutLongitude: longitude,
           attendanceMarkDate: todayDay,
           employeeId,
         };
-
+  
         try {
           const token = localStorage.getItem("Access Token");
-          console.log("Sending log to API:", newLog);
-
-          // Send only the new log object in the POST request
+          console.log("Clock-out Logs:", newLog);
+  
+          // Send the new log object to the API
           const response = await axios
             .post(`${config.hostedUrl}/logs/attendanceLogsPost`, newLog, {
               headers: {
@@ -150,51 +168,60 @@ const ClockInOut = () => {
               console.error("Error saving log:", error);
               throw error; // Rethrow to catch it in the outer block
             });
-
+  
           console.log("Response from API:", response);
           alert("Saved successfully");
-
+  
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, newLog];
           setLogs(updatedLogs);
           setUpdatedAttendanceLogs(updatedLogs);
-
-          // Update localStorage
+  
+          // Update localStorage with the new logs array
           localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         } catch (error) {
           console.error("Error saving log:", error);
           alert("Failed to save log. Please try again.");
         }
-
+  
         // Reset state after logging out
         setIsClockedIn(false);
         setClockInTime(null);
+        setClockInLatitude(null);
+        setClockInLongitude(null); 
+        setClockOutLatitude(null);
+        setClockOutLongitude(null); 
+  
+        // Remove items from localStorage
         localStorage.removeItem("isClockedIn");
         localStorage.removeItem("clockInTime");
         localStorage.removeItem("clockInAddress");
         localStorage.removeItem("attendanceMarkDate");
         localStorage.removeItem("address");
         localStorage.removeItem("clockLogs");
+        localStorage.removeItem("clockInLatitude");
+        localStorage.removeItem("clockInLongitude");
+        localStorage.removeItem("clockOutLatitude");
+        localStorage.removeItem("clockOutLongitude");
       });
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
   };
-
-
+  
   return (
     <div className="p-4 text-center">
-    
       {isClockedIn ? (
         <div>
-          <h1>You are Clocked In</h1>
-          <p>Clock-In Time: {clockInTime?.toLocaleString()}</p>
-          <p>Clock-In Address: {address}</p>
-          <button
-            onClick={handleClockOut}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Clock Out
-          </button>
-        </div>
+    <h1>You are Clocked In</h1>
+    <p>Clock-In Time: {clockInTime?.toLocaleString()}</p>
+    <p>Clock-In Address: {address}</p>
+    <p>Clock-In Latitude: {clockInLatitude}</p>
+    <p>Clock-In Longitude: {clockInLongitude}</p>
+    <p>Clock-In Latitude: {clockOutLatitude}</p>
+    <p>Clock-In Longitude: {clockOutLongitude}</p>
+    <button onClick={handleClockOut} className="bg-red-500 text-white px-4 py-2 rounded">Clock Out</button>
+  </div>
       ) : (
         <div>
           <h1>You are Clocked Out</h1>

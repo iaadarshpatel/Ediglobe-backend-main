@@ -6,6 +6,10 @@ const attendanceSchema = new mongoose.Schema({
     clockInAddress: { type: String, required: true },
     clockOutTime: { type: String, default: null },
     clockOutAddress: { type: String, default: null },
+    clockInLatitude: { type: String, required: true },
+    clockInLongitude: { type: String, required: true },
+    clockOutLatitude: { type: String },
+    clockOutLongitude: { type: String },
     attendanceMarkDate: { type: String, required: true },
 });
 
