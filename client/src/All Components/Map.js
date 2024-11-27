@@ -3,9 +3,8 @@ import axios from "axios";
 import config from "../config.js";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import MarkerIcon from "../assets/marker.gif"
-import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
+import { Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
 import { BsClockHistory } from "react-icons/bs";
-import { current } from "@reduxjs/toolkit";
 
 const ClockInOut = () => {
   const [isClockedIn, setIsClockedIn] = useState(false);
