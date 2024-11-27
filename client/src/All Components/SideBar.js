@@ -136,7 +136,7 @@ const SideBar = ( ) => {
                 <ListItemPrefix>
                   <CalendarDateRangeIcon className="h-5 w-5 text-black"/>
                 </ListItemPrefix>
-                <Typography className="mr-auto">Attendance</Typography>
+                <Typography className="mr-auto font-normal">Attendance</Typography>
               </AccordionHeader>
             </ListItem>
             <AccordionBody className="py-1">

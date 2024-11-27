@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../config.js";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import MarkerIcon from "../assets/marker.gif"
+import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
+import { BsClockHistory } from "react-icons/bs";
+import { current } from "@reduxjs/toolkit";
 
 const ClockInOut = () => {
   const [isClockedIn, setIsClockedIn] = useState(false);
@@ -13,12 +18,14 @@ const ClockInOut = () => {
   const [clockInLongitude, setClockInLongitude] = useState(null);
   const [clockOutLatitude, setClockOutLatitude] = useState(null);
   const [clockOutLongitude, setClockOutLongitude] = useState(null);
-
+  const [showMap, setShowMap] = useState(false);
+  const [size, setSize] = useState(false);
+  const handleOpen = (value) => setSize(value);
 
   const formatDateTime = () => {
     const date = new Date();
     const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
-    return todayDate; // Return the formatted date
+    return todayDate;
   };
 
   useEffect(() => {
@@ -41,9 +48,12 @@ const ClockInOut = () => {
     setLogs(savedLogs);
   }, []);
 
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog",
+  });
+
   const fetchAddress = async (lat, lng) => {
-    const API_KEY = "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog";
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${"AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog"}`;
     try {
       const response = await axios.get(url);
       const result = response.data;
@@ -54,37 +64,39 @@ const ClockInOut = () => {
   };
 
   const handleClockIn = async () => {
+    handleOpen("md");
+    setShowMap(true);
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
     const formattedDate = formatDateTime();
-  
+
     setIsClockedIn(true);
     setClockInTime(currentTime);
     setTodayDay(formattedDate);
-  
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         const fetchedAddress = await fetchAddress(latitude, longitude);
         setAddress(fetchedAddress);
-        setClockInLatitude(latitude);  
-        setClockInLongitude(longitude);  
-  
+        setClockInLatitude(latitude);
+        setClockInLongitude(longitude);
+
         // Save to localStorage after updating the state values
         localStorage.setItem("isClockedIn", "true");
         localStorage.setItem("clockInTime", currentTime.toISOString());
         localStorage.setItem("clockInAddress", fetchedAddress);
         localStorage.setItem("attendanceMarkDate", formattedDate);
-        localStorage.setItem("clockInLatitude", latitude);  
-        localStorage.setItem("clockInLongitude", longitude);  
-        
-  
+        localStorage.setItem("clockInLatitude", latitude);
+        localStorage.setItem("clockInLongitude", longitude);
+
+
         // Create the log object
         const clockInlog = {
           clockInTime: currentTime.toLocaleString(),
           clockInAddress: fetchedAddress,
-          clockInLatitude: latitude,  
-          clockInLongitude: longitude,  
+          clockInLatitude: latitude,
+          clockInLongitude: longitude,
           attendanceMarkDate: formattedDate,
           employeeId,
         };
@@ -105,12 +117,12 @@ const ClockInOut = () => {
             });
           console.log("Response from API:", response);
           alert("Saved successfully");
-  
+
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, clockInlog];
           setLogs(updatedLogs);
           setUpdatedAttendanceLogs(updatedLogs);
-  
+
           // Update localStorage with the new logs array
           localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         } catch (error) {
@@ -122,39 +134,40 @@ const ClockInOut = () => {
       setAddress("Geolocation not supported.");
     }
   };
-  
+
   const handleClockOut = async () => {
+    setShowMap(false);
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
     let fetchedAddress = "Address not available";
-  
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         fetchedAddress = await fetchAddress(latitude, longitude);
-  
+
         // Set the clock-out latitude and longitude in the state
         setClockOutLatitude(latitude);
         setClockOutLongitude(longitude);
-  
+
         // Create the latest log object including clock-out information
         const newLog = {
-          clockInTime: clockInTime?.toLocaleString(), 
+          clockInTime: clockInTime?.toLocaleString(),
           clockOutTime: currentTime.toLocaleString(),
-          clockInAddress: address, 
-          clockOutAddress: fetchedAddress, 
-          clockInLatitude: clockInLatitude,  
-          clockInLongitude: clockInLongitude,  
-          clockOutLatitude: latitude, 
+          clockInAddress: address,
+          clockOutAddress: fetchedAddress,
+          clockInLatitude: clockInLatitude,
+          clockInLongitude: clockInLongitude,
+          clockOutLatitude: latitude,
           clockOutLongitude: longitude,
           attendanceMarkDate: todayDay,
           employeeId,
         };
-  
+
         try {
           const token = localStorage.getItem("Access Token");
           console.log("Clock-out Logs:", newLog);
-  
+
           // Send the new log object to the API
           const response = await axios
             .post(`${config.hostedUrl}/logs/attendanceLogsPost`, newLog, {
@@ -168,30 +181,30 @@ const ClockInOut = () => {
               console.error("Error saving log:", error);
               throw error; // Rethrow to catch it in the outer block
             });
-  
+
           console.log("Response from API:", response);
           alert("Saved successfully");
-  
+
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, newLog];
           setLogs(updatedLogs);
           setUpdatedAttendanceLogs(updatedLogs);
-  
+
           // Update localStorage with the new logs array
           localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
         } catch (error) {
           console.error("Error saving log:", error);
           alert("Failed to save log. Please try again.");
         }
-  
+
         // Reset state after logging out
         setIsClockedIn(false);
         setClockInTime(null);
         setClockInLatitude(null);
-        setClockInLongitude(null); 
+        setClockInLongitude(null);
         setClockOutLatitude(null);
-        setClockOutLongitude(null); 
-  
+        setClockOutLongitude(null);
+
         // Remove items from localStorage
         localStorage.removeItem("isClockedIn");
         localStorage.removeItem("clockInTime");
@@ -208,51 +221,154 @@ const ClockInOut = () => {
       alert("Geolocation is not supported by this browser.");
     }
   };
-  
-  return (
-    <div className="p-4 text-center">
-      {isClockedIn ? (
-        <div>
-    <h1>You are Clocked In</h1>
-    <p>Clock-In Time: {clockInTime?.toLocaleString()}</p>
-    <p>Clock-In Address: {address}</p>
-    <p>Clock-In Latitude: {clockInLatitude}</p>
-    <p>Clock-In Longitude: {clockInLongitude}</p>
-    <p>Clock-In Latitude: {clockOutLatitude}</p>
-    <p>Clock-In Longitude: {clockOutLongitude}</p>
-    <button onClick={handleClockOut} className="bg-red-500 text-white px-4 py-2 rounded">Clock Out</button>
-  </div>
-      ) : (
-        <div>
-          <h1>You are Clocked Out</h1>
-          <button
-            onClick={handleClockIn}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Clock In
-          </button>
-        </div>
-      )}
 
-      <div className="mt-6">
-        <h2 className="text-lg font-bold">Clock-In/Out Logs</h2>
-        {updatedAttendanceLogs.length > 0 ? (
-          <ul className="mt-4 text-left">
-            {updatedAttendanceLogs.map((log, index) => (
-              <li key={index} className="py-1">
-                <strong>Clock-In:</strong> {log.clockInTime} <br />
-                <strong>Clock-In Address:</strong> {log.clockInAddress} <br />
-                <strong>Clock-Out:</strong> {log.clockOutTime} <br />
-                <strong>Clock-Out Address:</strong> {log.clockOutAddress} <br />
-                <strong>Attendance Date:</strong> {log.attendanceMarkDate} <br />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No logs available yet.</p>
-        )}
+  const mapContainerStyle = {
+    width: "100%",
+    height: "400px",
+    margin: "0 auto",
+    borderRadius: "5px",
+  };
+
+  const center = {
+    lat: clockInLatitude || 0,
+    lng: clockInLongitude || 0,
+  };
+
+  const mapOptions = {
+    zoom: 15,
+    disableDefaultUI: true,
+    zoomControl: false,
+    scrollwheel: false,
+    draggable: false,
+    disableDoubleClickZoom: true,
+    gestureHandling: 'none',
+    clickableIcons: false,
+    draggableCursor: 'default',
+    keyboardShortcuts: false
+  };
+
+  const customIcon = {
+    url: MarkerIcon,
+  };
+
+  return (
+    <>
+      <div className="w-full lg:w-1/2 flex justify-end">
+        <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
+          <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
+            GENERAL SHIFT (11:30 AM - 08:30 PM)
+            <h1
+              className={`text-xs font-bold border border-gray-400 rounded-lg p-1 ${isClockedIn ? "text-green-800" : "text-red-800"
+                } min-w-[1px] w-auto`}
+            >
+              {isClockedIn ? "Clocked In" : "Clocked Out"}
+            </h1>
+          </Typography>
+          <div className="mb-1 flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white">
+                <BsClockHistory className="h-7 w-7 text-black" />
+              </div>
+              <div className="flex flex-col gap-.5">
+                <div className="flex">
+                  <Typography variant="medium" color="blue-gray" className="font-bold pl-1">
+                    {todayDay}
+                  </Typography>
+                </div>
+                <div className="flex">
+                  <Typography className="text-sm !font-medium !text-gray-600">
+                    Worked for:{" "}
+                    <span className="font-bold text-black">
+                      {isClockedIn ? "4 / 8 Hrs" : "0 / 8 Hrs"}
+                    </span>
+                  </Typography>
+                </div>
+              </div>
+            </div>
+          </div>
+          {isClockedIn ? (
+            <>
+              <Typography className="text-sm !font-bold !text-black">
+                Clock-<span className="text-green-500 font-semibold">In</span> Time:{" "}
+                <span className="text-black-500 font-normal">
+                  {clockInTime?.toLocaleString()}
+                </span>
+              </Typography>
+              <Typography className="text-sm !font-bold !text-black">
+                Location: <span className="text-black-500 font-normal">{address}</span>
+              </Typography>
+              <Button
+                onClick={handleClockOut}
+                className="bg-red-700 mt-1 w-full lg:w-auto mb-0"
+              >
+                Clock Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography className="text-sm !font-bold !text-black">
+                You are currently: <span className="text-red-500">Clocked Out</span>
+              </Typography>
+              <Button
+                onClick={handleClockIn}
+                className="bg-green-700 mt-1 w-full lg:w-auto mb-0"
+              >
+                Clock In
+              </Button>
+            </>
+          )}
+        </Card>
       </div>
-    </div>
+      <Dialog
+        open={
+          size === "md"
+        }
+        size={size || "md"}
+        handler={handleOpen}
+      >
+        <DialogHeader>You are
+            <h1 className={`text-sm font-bold border border-gray-400 rounded-lg mx-2 p-1 
+            ${isClockedIn ? "text-green-800" : "text-red-800"
+              }`}>
+              {isClockedIn ? "Clocked In" : "Clocked Out"}
+              </h1> In ❤️
+        </DialogHeader>
+        <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
+        </Typography>
+        <DialogBody>
+          {showMap && isLoaded && (
+            <div className="w-full border border-sky-500 p-1 rounded-border">
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={center}
+                zoom={15}
+                options={mapOptions}
+              >
+                {clockInLatitude && clockInLongitude && (
+                  <Marker
+                    position={{ lat: clockInLatitude, lng: clockInLongitude }}
+                    icon={customIcon}
+                  />
+                )}
+                {clockOutLatitude && clockOutLongitude && (
+                  <Marker
+                    position={{ lat: clockOutLatitude, lng: clockOutLongitude }}
+                  />
+                )}
+              </GoogleMap>
+            </div>
+          )}
+        </DialogBody>
+        <DialogFooter className="flex justify-between">
+          <span className="bg-black px-2 py-3 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
+            Precise Location: ON
+          </span>
+          <Button variant="gradient" color="green" onClick={handleOpen}>
+            <span>Back To HomePage</span>
+          </Button>
+        </DialogFooter>
+      </Dialog>
+    </>
   );
 };
 

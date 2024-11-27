@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Typography, ListItem, Switch, Button, Card } from "@material-tailwind/react";
+import { Typography, ListItem, Switch } from "@material-tailwind/react";
 import { FaCheckCircle, FaHome, FaHospitalUser, FaUmbrellaBeach, FaQuestionCircle, FaUserClock } from 'react-icons/fa';
 import { GiMoneyStack, GiWitchFlight } from 'react-icons/gi';
-import { BsClockHistory } from "react-icons/bs";
 import { CalendarDateRangeIcon, PencilSquareIcon, ClockIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid'
 import { MdPunchClock, MdSick } from 'react-icons/md';
 import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
 import config from "../config.js";
+import Map from "./Map";
 
 const customColor = '#000000';
 
@@ -99,6 +99,7 @@ const EmojiAttendance = () => {
     const storedEmployeeId = localStorage.getItem('employeeId');
 
     const token = localStorage.getItem("Access Token");
+
     const fetcher = (url) =>
         fetch(url, {
             headers: {
@@ -201,10 +202,6 @@ const EmojiAttendance = () => {
     // Create an array of month-year options from the monthlyCounts
     const monthOptions = Object.keys(monthlyCounts);
 
-    const today = new Date();
-    const todayDate = today.getDate() + ' ' + today.toLocaleString('default', { month: 'short' });
-    const todayDay = today.toLocaleString('default', { weekday: 'long' });
-
     const toggleVisibility = () => {
         setIsVisible(prev => !prev);
     };
@@ -231,7 +228,7 @@ const EmojiAttendance = () => {
                         Attendance details are listed in the tab. For corrections, please contact HR.
                     </Typography>
                     <div className="flex flex-col items-start gap-2 mt-1">
-                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                             <ClipboardDocumentCheckIcon className="h-5 w-5 text-black" />
                             <Typography
                                 color="gray"
@@ -270,38 +267,7 @@ const EmojiAttendance = () => {
                     </div>
                 </div>
                 {/* Right Section */}
-                <div className="w-full lg:w-1/2 flex justify-end">
-                    <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
-                        <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
-                            GENERAL SHIFT (11:30 AM - 08:30 PM)
-                            <h1 className="text-sm font-bold text-red-800 border border-gray-400 rounded-lg p-1">Clocked Out</h1>
-                        </Typography>
-                        <div className="mb-1 flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-white">
-                                <BsClockHistory className="h-7 w-7 text-black" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex">
-                                        <Typography variant="medium" color="blue-gray" className="font-bold">
-                                            {todayDate}
-                                        </Typography>
-                                        <Typography variant="medium" color="gray" className="font-bold pl-1">
-                                            {todayDay}
-                                        </Typography>
-                                    </div>
-                                    <div className="flex">
-                                        <Typography className="text-sm !font-medium !text-gray-600">
-                                            Worked for: <span className="font-bold text-black"> 0 / 8 Hrs</span>
-                                        </Typography>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <Typography className="text-sm !font-bold !text-black">Clock-<span className="text-green-500 font-semibold">In</span> Time: <span className="text-red-500 font-semibold"> Clocked Out</span></Typography> 
-                        <Button className="bg-green-700 mt-1 w-full lg:w-auto mb-0">Clock In</Button>
-                    </Card>
-                </div>
+                <Map/>
             </div>
 
             <div className="flex items-center gap-4">
