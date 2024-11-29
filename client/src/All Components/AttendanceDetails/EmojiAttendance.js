@@ -6,8 +6,8 @@ import { CalendarDateRangeIcon, PencilSquareIcon, ClockIcon, ClipboardDocumentCh
 import { MdPunchClock, MdSick } from 'react-icons/md';
 import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
-import config from "../config.js";
-import Map from "./Map";
+import config from "../../config.js";
+import Map from "./Map.js";
 
 const customColor = '#000000';
 
@@ -261,7 +261,7 @@ const EmojiAttendance = () => {
                                 color="gray"
                                 className="text-sm font-normal text-blue-gray-500"
                             >
-                                Clock <span className="text-green-800 font-semibold">In</span> and <span className="text-red-800 font-semibold">Out</span> available <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">New</span>
+                                Clock <span className="text-green-800 font-semibold">In</span> and <span className="text-red-800 font-semibold">Out</span> available (Do it once) <span className="inline-flex items-center rounded-md ml-1 bg-black px-2 py-1 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">New</span>
                             </Typography>
                         </div>
                     </div>
@@ -271,7 +271,7 @@ const EmojiAttendance = () => {
             </div>
 
             <div className="flex items-center gap-4">
-                <Typography variant="md" color="blue-gray" className="whitespace-nowrap">
+                <Typography variant="md" color="blue-gray" className="whitespace-nowrap font-normal">
                     Select Month:
                 </Typography>
                 <select

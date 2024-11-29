@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import config from "../config.js";
+import config from "../../config.js";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import MarkerIcon from "../assets/marker.gif"
+import MarkerIcon from "../../assets/marker.gif";
 import { Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
 import { BsClockHistory } from "react-icons/bs";
 
@@ -20,6 +20,26 @@ const ClockInOut = () => {
   const [showMap, setShowMap] = useState(false);
   const [size, setSize] = useState(false);
   const handleOpen = (value) => setSize(value);
+
+  const Employee_Id = localStorage.getItem('employeeId');
+  const token = localStorage.getItem("Access Token");
+
+  useEffect(() => {
+    const fetchEmployeeAttendanceLogs = async () => {
+      try {
+        const response = await axios.get(`${config.hostedUrl}/attendanceLogs/${Employee_Id}`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        setUpdatedAttendanceLogs(response.data);
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
+    };
+
+    fetchEmployeeAttendanceLogs();
+  }, [Employee_Id, token]);
 
   const formatDateTime = () => {
     const date = new Date();
@@ -63,7 +83,7 @@ const ClockInOut = () => {
   };
 
   const handleClockIn = async () => {
-    handleOpen("md");
+    handleOpen("xl");
     setShowMap(true);
     const employeeId = localStorage.getItem("employeeId");
     const currentTime = new Date();
@@ -99,7 +119,6 @@ const ClockInOut = () => {
           attendanceMarkDate: formattedDate,
           employeeId,
         };
-        console.log("Clock-in logs:", clockInlog);
         try {
           const token = localStorage.getItem("Access Token");
           const response = await axios
@@ -114,8 +133,7 @@ const ClockInOut = () => {
               console.error("Error saving log:", error);
               throw error;
             });
-          console.log("Response from API:", response);
-          alert("Saved successfully");
+          // alert("Saved successfully");
 
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, clockInlog];
@@ -165,7 +183,6 @@ const ClockInOut = () => {
 
         try {
           const token = localStorage.getItem("Access Token");
-          console.log("Clock-out Logs:", newLog);
 
           // Send the new log object to the API
           const response = await axios
@@ -180,9 +197,7 @@ const ClockInOut = () => {
               console.error("Error saving log:", error);
               throw error; // Rethrow to catch it in the outer block
             });
-
-          console.log("Response from API:", response);
-          alert("Saved successfully");
+          alert("Clocked Out successfully");
 
           // Update the logs array locally after successful post
           const updatedLogs = [...logs, newLog];
@@ -278,7 +293,7 @@ const ClockInOut = () => {
                   <Typography className="text-sm !font-medium !text-gray-600">
                     Worked for:{" "}
                     <span className="font-bold text-black">
-                      {isClockedIn ? "4 / 8 Hrs" : "0 / 8 Hrs"}
+                      0 / 8 hours
                     </span>
                   </Typography>
                 </div>
@@ -296,43 +311,52 @@ const ClockInOut = () => {
               <Typography className="text-sm !font-bold !text-black">
                 Location: <span className="text-black-500 font-normal">{address}</span>
               </Typography>
-              <Button
-                onClick={handleClockOut}
-                className="bg-red-700 mt-1 w-full lg:w-auto mb-0"
-              >
-                Clock Out
-              </Button>
+              <div className="flex gap-1 w-full mt-1">
+                <Button
+                  onClick={handleClockOut}
+                  className="bg-red-700 w-3/4"
+                >
+                  Clock Out
+                </Button>
+                <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
+              </div>
             </>
           ) : (
             <>
               <Typography className="text-sm !font-bold !text-black">
                 You are currently: <span className="text-red-500">Clocked Out</span>
               </Typography>
-              <Button
-                onClick={handleClockIn}
-                className="bg-green-700 mt-1 w-full lg:w-auto mb-0"
-              >
-                Clock In
-              </Button>
+              <div className="flex gap-1 w-full mt-1">
+                <Button
+                  onClick={handleClockIn}
+                  className="bg-green-700 w-3/4"
+                >
+                  Clock In
+                </Button>
+                <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
+              </div>
             </>
           )}
         </Card>
       </div>
       <Dialog
-        open={
-          size === "md"
-        }
+        open={size === "xl"}
         size={size || "md"}
         handler={handleOpen}
       >
-        <DialogHeader>You are
-            <h1 className={`text-sm font-bold border border-gray-400 rounded-lg mx-2 p-1 
-            ${isClockedIn ? "text-green-800" : "text-red-800"
-              }`}>
-              {isClockedIn ? "Clocked In" : "Clocked Out"}
-              </h1> In ❤️
+        <DialogHeader className="text-center sm:text-left">
+          You are
+          <h1
+            className={`text-sm sm:text-base font-bold border border-gray-400 rounded-lg mx-2 p-1 
+        ${isClockedIn ? "text-green-800" : "text-red-800"}
+      `}
+          >
+            {isClockedIn ? "Clocked In" : "Clocked Out"}
+          </h1>
+          In ❤️
         </DialogHeader>
         <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
+          {/* Additional content can go here */}
         </Typography>
         <DialogBody>
           {showMap && isLoaded && (
@@ -358,8 +382,8 @@ const ClockInOut = () => {
             </div>
           )}
         </DialogBody>
-        <DialogFooter className="flex justify-between">
-          <span className="bg-black px-2 py-3 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20">
+        <DialogFooter className="flex flex-col sm:flex-row justify-between">
+          <span className="bg-black px-2 py-3 text-xs font-bold text-white ring-1 ring-inset ring-green-600/20 mb-2 sm:mb-0">
             Precise Location: ON
           </span>
           <Button variant="gradient" color="green" onClick={handleOpen}>
@@ -367,6 +391,56 @@ const ClockInOut = () => {
           </Button>
         </DialogFooter>
       </Dialog>
+
+      <Dialog
+      className="h-screen overflow-y-scroll"
+        open={
+          size === "xxl"
+        }
+        size={size || "md"}
+        handler={handleOpen}
+      >
+        <DialogHeader className="flex justify-between">
+          All the Attendance Logs
+          <DialogFooter>
+            <Button variant="text" color="red" onClick={() => handleOpen(null)}className="mr-1 border border-red-700">
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogHeader>
+
+         <DialogBody>
+         <div className="bg-white mb-0 p-0 border-radius">
+        {updatedAttendanceLogs && updatedAttendanceLogs.length > 0 ? (
+          <ul className="space-y-4">
+            {updatedAttendanceLogs.map((log, index) => (
+              <li key={log._id.$oid || index} className="border text-black p-3 rounded-lg shadow-sm">
+                <h3 className="font-bold text-lg mb-2">
+                  {log.attendanceMarkDate}
+                </h3>
+                <p>
+                  <strong>Clock In Time:</strong> {log.clockInTime}
+                </p>
+                <p>
+                  <strong>Clock In Address:</strong> {log.clockInAddress}
+                </p>
+                <p>
+                  <strong>Clock Out Time:</strong> {log.clockOutTime || "N/A"}
+                </p>
+                <p>
+                  <strong>Clock Out Address:</strong> {log.clockOutAddress || "N/A"}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No attendance logs available.</p>
+        )}
+        </div>
+      </DialogBody>
+
+      </Dialog>
+
     </>
   );
 };

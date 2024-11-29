@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import config from '../config.js';
+import config from '../../config.js';
 
 const AttendanceShortForm = {
   "P": "Present",

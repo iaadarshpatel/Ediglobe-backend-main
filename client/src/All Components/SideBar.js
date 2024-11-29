@@ -19,8 +19,7 @@ const SideBar = ( ) => {
   const dispatch = useDispatch();
   const allDetails = useSelector(state => state.employeesDetails);
 
-  const {Designation
-  } = allDetails.data || {};
+  const {Designation} = allDetails.data || {};
 
    // Fetch employee details on component mount
    useEffect(() => {
