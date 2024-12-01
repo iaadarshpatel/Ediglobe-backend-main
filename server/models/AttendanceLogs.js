@@ -11,8 +11,8 @@ const attendanceSchema = new mongoose.Schema({
     clockOutLatitude: { type: String },
     clockOutLongitude: { type: String },
     attendanceMarkDate: { type: String, required: true },
-});
+}, { timestamps: true });  
 
 const AttendanceLogs = mongoose.model('attendanceLogs', attendanceSchema);
 
-export default AttendanceLogs;   
+export default AttendanceLogs;

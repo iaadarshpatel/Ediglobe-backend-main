@@ -3,10 +3,11 @@ import axios from "axios";
 import config from "../../config.js";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import MarkerIcon from "../../assets/marker.gif";
-import { Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
+import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
 import { BsClockHistory } from "react-icons/bs";
 
 const ClockInOut = () => {
+  const [loader, setLoader] = useState({punching: false, fetching: false});
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState(null);
   const [address, setAddress] = useState("");
@@ -25,22 +26,26 @@ const ClockInOut = () => {
   const token = localStorage.getItem("Access Token");
 
   const targetLocation = {
-    lat: 12.8827581,
-    lng: 77.6511447,
+    lat: 12.8903909,
+    lng: 77.6421465,
   };
 
+  // Data from api
   useEffect(() => {
     const fetchEmployeeAttendanceLogs = async () => {
       try {
+        setLoader({ ...loader, fetching: true });
         const response = await axios.get(`${config.hostedUrl}/attendanceLogs/${Employee_Id}`, {
           headers: {
             Authorization: token,
           },
         });
         setUpdatedAttendanceLogs(response.data);
-        setLogs(response.data); // Update local state for display
+        setLogs(response.data); 
       } catch (error) {
         console.error("Error fetching employee attendance logs:", error);
+      } finally {
+        setLoader({ ...loader, fetching: false });
       }
     };
 
@@ -54,23 +59,31 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    // Restore saved states from localStorage
     const savedClockInState = localStorage.getItem("isClockedIn");
+    const {clockInTime, clockOutTime, clockInAddress, attendanceMarkDate} = updatedAttendanceLogs.length > 0 ? updatedAttendanceLogs[updatedAttendanceLogs.length - 1] : {};
+    const isClockedIn = !!clockInTime ;
+    const isClockedOut = isClockedIn && !!clockOutTime;
     const savedClockInTime = localStorage.getItem("clockInTime");
     const savedClockInAddress = localStorage.getItem("clockInAddress");
     const savedAttendanceMarkDate = localStorage.getItem("attendanceMarkDate");
     const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
 
-    if (savedClockInState === "true" && savedClockInTime) {
+    if (!isClockedIn && !isClockedOut) {
+      setIsClockedIn(false);
+      setTodayDay(attendanceMarkDate || formatDateTime());
+    } 
+    else if(isClockedIn && !isClockedOut) {
       setIsClockedIn(true);
-      setClockInTime(new Date(savedClockInTime));
-      setAddress(savedClockInAddress || "Address not found.");
-      setTodayDay(savedAttendanceMarkDate || formatDateTime());
-    } else {
-      setTodayDay(savedAttendanceMarkDate || formatDateTime());
+      setClockInTime(new Date(clockInTime));
+      setAddress(clockInAddress || "Address not found.");
+      setTodayDay(attendanceMarkDate || formatDateTime());
+    } 
+    else if (isClockedIn && isClockedOut) {
+      setIsClockedIn(false);
+      setTodayDay(attendanceMarkDate || formatDateTime());
     }
     setLogs(savedLogs);
-  }, []);
+  }, [updatedAttendanceLogs]);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyByruGZGFedhP3qrKosNr86J4_5VtbvHog",
@@ -108,15 +121,20 @@ const ClockInOut = () => {
     const currentTime = new Date();
     const formattedDate = formatDateTime();
 
+    // Check if geolocation is available
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
+          // Fetch user's current coordinates
           const { latitude, longitude } = position.coords;
 
-          // Calculate the distance between the user's current location and the target location
+          // Calculate distance between user's location and target location
           const distance = calculateDistance(latitude, longitude, targetLocation.lat, targetLocation.lng);
 
-          if (distance <= 10000) {
+          // Check if user is within the 3000-meter threshold
+          if (distance <= 12000) {
+
+            // Fetch the address of the current location
             const fetchedAddress = await fetchAddress(latitude, longitude);
 
             // Update state
@@ -127,7 +145,7 @@ const ClockInOut = () => {
             setClockInLatitude(latitude);
             setClockInLongitude(longitude);
 
-            // Save to localStorage
+            // Save data to localStorage
             localStorage.setItem("isClockedIn", "true");
             localStorage.setItem("clockInTime", currentTime.toISOString());
             localStorage.setItem("clockInAddress", fetchedAddress);
@@ -138,7 +156,7 @@ const ClockInOut = () => {
             handleOpen("xl");
             setShowMap(true);
 
-            // Create the log object
+            // Create the log object for API
             const clockInlog = {
               clockInTime: currentTime.toLocaleString(),
               clockInAddress: fetchedAddress,
@@ -148,7 +166,9 @@ const ClockInOut = () => {
               employeeId: Employee_Id,
             };
 
+            // API call to save attendance log
             try {
+              setLoader({...loader, punching: true});
               const token = localStorage.getItem("Access Token");
               const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost`, clockInlog, {
                 headers: {
@@ -157,25 +177,28 @@ const ClockInOut = () => {
                 },
               });
 
+              // Update logs in state and localStorage
               const updatedLogs = [...logs, clockInlog];
               setLogs(updatedLogs);
               setUpdatedAttendanceLogs(updatedLogs);
               localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
-
-              alert(`${response.data.message || "Log saved successfully."}`);
             } catch (error) {
               console.error("Error saving log:", error);
               alert("Failed to save log. Please try again.");
+            } finally {
+              setLoader({...loader, punching: false});
             }
           } else {
-            alert("You must be within 30 meters of the Office location to clock in.");
+            alert("You must be within the Office location to clock in.");
           }
         },
         (error) => {
+          console.error("Error obtaining location:", error);
           alert("Location access is required to clock in. Please enable location services and try again.");
         }
       );
     } else {
+      console.log("Geolocation is not supported by your browser.");
       alert("Geolocation is not supported by your browser.");
     }
   };
@@ -208,6 +231,7 @@ const ClockInOut = () => {
           };
 
           try {
+            setLoader({...loader, punching: true});
             const token = localStorage.getItem("Access Token");
             const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost`, newLog, {
               headers: {
@@ -224,10 +248,12 @@ const ClockInOut = () => {
             // Clear clock-in state
             localStorage.setItem("isClockedIn", "false");
             setIsClockedIn(false);
-            alert("Clock-out successful!");
+            resetClockInState();
           } catch (error) {
             console.error("Error saving log:", error);
             alert("Failed to save clock-out log.");
+          } finally {
+            setLoader({...loader, punching: false});
           }
         },
         (error) => {
@@ -239,7 +265,6 @@ const ClockInOut = () => {
     }
   };
 
-  // Utility to reset clock-in state
   const resetClockInState = () => {
     setIsClockedIn(false);
     setClockInTime(null);
@@ -288,11 +313,13 @@ const ClockInOut = () => {
   const customIcon = {
     url: MarkerIcon,
   };
-
   return (
     <>
       <div className="w-full lg:w-1/2 flex justify-end">
-        <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
+      {loader.fetching  ? 
+        <Chip color='indigo' value="Loading..." className='normal-case text-white bg-black font-bold inline-block pt-2 ml-1' />
+        : (
+          <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
           <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
             GENERAL SHIFT (11:30 AM - 08:30 PM)
             <h1
@@ -324,6 +351,7 @@ const ClockInOut = () => {
               </div>
             </div>
           </div>
+
           {isClockedIn ? (
             <>
               <Typography className="text-sm !font-bold !text-black">
@@ -338,9 +366,8 @@ const ClockInOut = () => {
               <div className="flex gap-1 w-full mt-1">
                 <Button
                   onClick={handleClockOut}
-                  className="bg-red-700 w-3/4"
-                >
-                  Clock Out
+                  className="bg-red-700 w-3/4">
+                  {loader.punching ? "Punching..." : "Clock Out"}
                 </Button>
                 <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
               </div>
@@ -353,15 +380,16 @@ const ClockInOut = () => {
               <div className="flex gap-1 w-full mt-1">
                 <Button
                   onClick={handleClockIn}
-                  className="bg-green-700 w-3/4"
-                >
-                  Clock In
+                  className="bg-green-700 w-3/4">
+                  {loader.punching ? "Punching..." : "Clock In"}
                 </Button>
                 <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
               </div>
             </>
           )}
         </Card>
+      )}
+        
       </div>
       <Dialog
         open={size === "xl"}

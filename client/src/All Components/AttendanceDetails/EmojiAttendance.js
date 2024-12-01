@@ -145,9 +145,8 @@ const EmojiAttendance = () => {
 
                 // Filter data based on storedEmployeeId
                 const filteredData = storedEmployeeId
-                    ? parsedData.filter((item) => item.Employee_Id === storedEmployeeId)
+                    ? parsedData?.filter((item) => item.Employee_Id === storedEmployeeId)
                     : parsedData;
-
 
                 // Create a flat array from the attendance data
                 const attendanceEntries = [];
