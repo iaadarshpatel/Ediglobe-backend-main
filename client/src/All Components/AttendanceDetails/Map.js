@@ -5,14 +5,15 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import MarkerIcon from "../../assets/marker.gif";
 import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
 import { BsClockHistory } from "react-icons/bs";
+import { ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 
 const ClockInOut = () => {
-  const [loader, setLoader] = useState({punching: false, fetching: false});
+  const [loader, setLoader] = useState({ punching: false, fetching: false });
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState(null);
   const [address, setAddress] = useState("");
   const [todayDay, setTodayDay] = useState("");
-  const [logs, setLogs] = useState([]);
+  // const [logs, setLogs] = useState([]);
   const [updatedAttendanceLogs, setUpdatedAttendanceLogs] = useState([]);
   const [clockInLatitude, setClockInLatitude] = useState(null);
   const [clockInLongitude, setClockInLongitude] = useState(null);
@@ -34,21 +35,20 @@ const ClockInOut = () => {
   useEffect(() => {
     const fetchEmployeeAttendanceLogs = async () => {
       try {
-        setLoader({ ...loader, fetching: true });
+        setLoader((prevLoader) => ({ ...prevLoader, fetching: true }));
         const response = await axios.get(`${config.hostedUrl}/attendanceLogs/${Employee_Id}`, {
           headers: {
             Authorization: token,
           },
         });
         setUpdatedAttendanceLogs(response.data);
-        setLogs(response.data); 
+        // setLogs(response.data);
       } catch (error) {
         console.error("Error fetching employee attendance logs:", error);
       } finally {
-        setLoader({ ...loader, fetching: false });
+        setLoader((prevLoader) => ({ ...prevLoader, fetching: false }));
       }
     };
-
     fetchEmployeeAttendanceLogs();
   }, [Employee_Id, token]);
 
@@ -59,30 +59,26 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    const savedClockInState = localStorage.getItem("isClockedIn");
-    const {clockInTime, clockOutTime, clockInAddress, attendanceMarkDate} = updatedAttendanceLogs.length > 0 ? updatedAttendanceLogs[updatedAttendanceLogs.length - 1] : {};
-    const isClockedIn = !!clockInTime ;
+    const { clockInTime, clockOutTime, clockInAddress, attendanceMarkDate } = updatedAttendanceLogs.length > 0 ? updatedAttendanceLogs[updatedAttendanceLogs.length - 1] : {};
+    const isClockedIn = !!clockInTime;
     const isClockedOut = isClockedIn && !!clockOutTime;
-    const savedClockInTime = localStorage.getItem("clockInTime");
-    const savedClockInAddress = localStorage.getItem("clockInAddress");
-    const savedAttendanceMarkDate = localStorage.getItem("attendanceMarkDate");
-    const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
+    // const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
 
     if (!isClockedIn && !isClockedOut) {
       setIsClockedIn(false);
       setTodayDay(attendanceMarkDate || formatDateTime());
-    } 
-    else if(isClockedIn && !isClockedOut) {
+    }
+    else if (isClockedIn && !isClockedOut) {
       setIsClockedIn(true);
       setClockInTime(new Date(clockInTime));
       setAddress(clockInAddress || "Address not found.");
       setTodayDay(attendanceMarkDate || formatDateTime());
-    } 
+    }
     else if (isClockedIn && isClockedOut) {
       setIsClockedIn(false);
       setTodayDay(attendanceMarkDate || formatDateTime());
     }
-    setLogs(savedLogs);
+    // setLogs(savedLogs);
   }, [updatedAttendanceLogs]);
 
   const { isLoaded } = useJsApiLoader({
@@ -146,12 +142,12 @@ const ClockInOut = () => {
             setClockInLongitude(longitude);
 
             // Save data to localStorage
-            localStorage.setItem("isClockedIn", "true");
-            localStorage.setItem("clockInTime", currentTime.toISOString());
-            localStorage.setItem("clockInAddress", fetchedAddress);
-            localStorage.setItem("attendanceMarkDate", formattedDate);
-            localStorage.setItem("clockInLatitude", latitude);
-            localStorage.setItem("clockInLongitude", longitude);
+            // localStorage.setItem("isClockedIn", "true");
+            // localStorage.setItem("clockInTime", currentTime.toISOString());
+            // localStorage.setItem("clockInAddress", fetchedAddress);
+            // localStorage.setItem("attendanceMarkDate", formattedDate);
+            // localStorage.setItem("clockInLatitude", latitude);
+            // localStorage.setItem("clockInLongitude", longitude);
 
             handleOpen("xl");
             setShowMap(true);
@@ -168,7 +164,7 @@ const ClockInOut = () => {
 
             // API call to save attendance log
             try {
-              setLoader({...loader, punching: true});
+              setLoader({ ...loader, punching: true });
               const token = localStorage.getItem("Access Token");
               const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost`, clockInlog, {
                 headers: {
@@ -178,15 +174,15 @@ const ClockInOut = () => {
               });
 
               // Update logs in state and localStorage
-              const updatedLogs = [...logs, clockInlog];
-              setLogs(updatedLogs);
+              const updatedLogs = [...updatedAttendanceLogs, clockInlog];
+              // setLogs(updatedLogs);
               setUpdatedAttendanceLogs(updatedLogs);
-              localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
+              // localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
             } catch (error) {
               console.error("Error saving log:", error);
               alert("Failed to save log. Please try again.");
             } finally {
-              setLoader({...loader, punching: false});
+              setLoader({ ...loader, punching: false });
             }
           } else {
             alert("You must be within the Office location to clock in.");
@@ -231,7 +227,7 @@ const ClockInOut = () => {
           };
 
           try {
-            setLoader({...loader, punching: true});
+            setLoader({ ...loader, punching: true });
             const token = localStorage.getItem("Access Token");
             const response = await axios.post(`${config.hostedUrl}/logs/attendanceLogsPost`, newLog, {
               headers: {
@@ -239,21 +235,21 @@ const ClockInOut = () => {
                 "Content-Type": "application/json",
               },
             });
-
-            const updatedLogs = [...logs, newLog];
-            setLogs(updatedLogs);
+            alert("Clocked Out Successfully!");
+            const updatedLogs = [...updatedAttendanceLogs, newLog];
+            // setLogs(updatedLogs);
             setUpdatedAttendanceLogs(updatedLogs);
-            localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
+            // localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
 
             // Clear clock-in state
-            localStorage.setItem("isClockedIn", "false");
+            // localStorage.setItem("isClockedIn", "false");
             setIsClockedIn(false);
             resetClockInState();
           } catch (error) {
             console.error("Error saving log:", error);
-            alert("Failed to save clock-out log.");
+            alert("Failed to save clock-out log");
           } finally {
-            setLoader({...loader, punching: false});
+            setLoader({ ...loader, punching: false });
           }
         },
         (error) => {
@@ -274,15 +270,15 @@ const ClockInOut = () => {
     setClockOutLongitude(null);
 
     // Clear local storage
-    localStorage.removeItem("isClockedIn");
-    localStorage.removeItem("clockInTime");
-    localStorage.removeItem("clockInAddress");
-    localStorage.removeItem("attendanceMarkDate");
-    localStorage.removeItem("clockLogs");
-    localStorage.removeItem("clockInLatitude");
-    localStorage.removeItem("clockInLongitude");
-    localStorage.removeItem("clockOutLatitude");
-    localStorage.removeItem("clockOutLongitude");
+    // localStorage.removeItem("isClockedIn");
+    // localStorage.removeItem("clockInTime");
+    // localStorage.removeItem("clockInAddress");
+    // localStorage.removeItem("attendanceMarkDate");
+    // localStorage.removeItem("clockLogs");
+    // localStorage.removeItem("clockInLatitude");
+    // localStorage.removeItem("clockInLongitude");
+    // localStorage.removeItem("clockOutLatitude");
+    // localStorage.removeItem("clockOutLongitude");
   };
 
   const mapContainerStyle = {
@@ -316,80 +312,79 @@ const ClockInOut = () => {
   return (
     <>
       <div className="w-full lg:w-1/2 flex justify-end">
-      {loader.fetching  ? 
-        <Chip color='indigo' value="Loading..." className='normal-case text-white bg-black font-bold inline-block pt-2 ml-1' />
-        : (
-          <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
-          <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
-            GENERAL SHIFT (11:30 AM - 08:30 PM)
-            <h1
-              className={`text-xs font-bold border border-gray-400 rounded-lg p-1 ${isClockedIn ? "text-green-800" : "text-red-800"
-                } min-w-[1px] w-auto`}
-            >
-              {isClockedIn ? "Clocked In" : "Clocked Out"}
-            </h1>
-          </Typography>
-          <div className="mb-1 flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-white">
-                <BsClockHistory className="h-7 w-7 text-black" />
-              </div>
-              <div className="flex flex-col gap-.5">
-                <div className="flex">
-                  <Typography variant="medium" color="blue-gray" className="font-bold pl-1">
-                    {todayDay}
-                  </Typography>
+        {loader.fetching ?
+          <Chip color='indigo' value="Loading Attendance..." className='normal-case text-white bg-black font-bold inline-block pt-2 ml-1' />
+          : (
+            <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
+              <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">
+                GENERAL SHIFT (11:30 AM - 08:30 PM)
+                <h1
+                  className={`text-xs font-bold border border-gray-400 rounded-lg p-1 ${isClockedIn ? "text-green-800" : "text-red-800"
+                    } min-w-[1px] w-auto`}
+                >
+                  {isClockedIn ? "Clocked In" : "Clocked Out"}
+                </h1>
+              </Typography>
+              <div className="mb-1 flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white">
+                    <BsClockHistory className="h-7 w-7 text-black" />
+                  </div>
+                  <div className="flex flex-col gap-.5">
+                    <div className="flex">
+                      <Typography variant="medium" color="blue-gray" className="font-bold pl-1">
+                        {todayDay}
+                      </Typography>
+                    </div>
+                    <div className="flex">
+                      <Typography className="text-sm !font-medium !text-gray-600">
+                        Worked for:{" "}
+                        <span className="font-bold text-black">
+                          0 / 8 hours
+                        </span>
+                      </Typography>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex">
-                  <Typography className="text-sm !font-medium !text-gray-600">
-                    Worked for:{" "}
-                    <span className="font-bold text-black">
-                      0 / 8 hours
+              </div>
+
+              {isClockedIn ? (
+                <>
+                  <Typography className="text-sm !font-bold !text-black">
+                    Clock-<span className="text-green-500 font-semibold">In</span> Time:{" "}
+                    <span className="text-black-500 font-normal">
+                      {clockInTime?.toLocaleString()}
                     </span>
                   </Typography>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {isClockedIn ? (
-            <>
-              <Typography className="text-sm !font-bold !text-black">
-                Clock-<span className="text-green-500 font-semibold">In</span> Time:{" "}
-                <span className="text-black-500 font-normal">
-                  {clockInTime?.toLocaleString()}
-                </span>
-              </Typography>
-              <Typography className="text-sm !font-bold !text-black">
-                Location: <span className="text-black-500 font-normal">{address}</span>
-              </Typography>
-              <div className="flex gap-1 w-full mt-1">
-                <Button
-                  onClick={handleClockOut}
-                  className="bg-red-700 w-3/4">
-                  {loader.punching ? "Punching..." : "Clock Out"}
-                </Button>
-                <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <Typography className="text-sm !font-bold !text-black">
-                You are currently: <span className="text-red-500">Clocked Out</span>
-              </Typography>
-              <div className="flex gap-1 w-full mt-1">
-                <Button
-                  onClick={handleClockIn}
-                  className="bg-green-700 w-3/4">
-                  {loader.punching ? "Punching..." : "Clock In"}
-                </Button>
-                <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
-              </div>
-            </>
+                  <Typography className="text-sm !font-bold !text-black">
+                    Location: <span className="text-black-500 font-normal">{address}</span>
+                  </Typography>
+                  <div className="flex gap-1 w-full mt-1">
+                    <Button
+                      onClick={handleClockOut}
+                      className="bg-red-700 w-3/4">
+                      {loader.punching ? "Punching..." : "Clock Out"}
+                    </Button>
+                    <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Typography className="text-sm !font-bold !text-black">
+                    You are currently: <span className="text-red-500">Clocked Out</span>
+                  </Typography>
+                  <div className="flex gap-1 w-full mt-1">
+                    <Button
+                      onClick={handleClockIn}
+                      className="bg-green-700 w-3/4">
+                      {loader.punching ? "Punching..." : "Clock In"}
+                    </Button>
+                    <Button className="bg-black px-0 w-1/4" onClick={() => handleOpen("xxl")}>Logs</Button>
+                  </div>
+                </>
+              )}
+            </Card>
           )}
-        </Card>
-      )}
-        
       </div>
       <Dialog
         open={size === "xl"}
@@ -453,49 +448,107 @@ const ClockInOut = () => {
         handler={handleOpen}
       >
         <DialogHeader className="flex justify-between">
-          All the Attendance Logs
-          <DialogFooter>
-            <Button variant="text" color="red" onClick={() => handleOpen(null)} className="mr-1 border border-red-700">
-              Cancel
-            </Button>
-          </DialogFooter>
+          <div className="flex justify-between w-full mt-1 pt-3 pb-4 z-10 px-4 rounded-border bg-transparent">
+            <div className="w-full mb-3 lg:mb-0">
+              <div className="mb-1 flex justify-between items-center gap-3">
+                <Typography
+                  variant="md"
+                  color="blue-gray"
+                  className="font-bold transition-colors hover:text-gray-900">
+                  Attendance Logs:
+                </Typography>
+                <Button variant="text" color="red" onClick={() => handleOpen(null)} className="mr-1 border border-red-700">
+                      Cancel
+                    </Button>
+              </div>
+              <div className="flex flex-col items-start gap-2 mt-1">
+                <div className="flex items-center gap-2">
+                  <ArrowRightCircleIcon className="h-5 w-5 text-black" />
+                  <Typography
+                    color="gray"
+                    className="text-sm font-normal text-blue-gray-500"
+                  >This page shows your attendance records, including dates, clock-in/out times, and locations.
+                  </Typography>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowRightCircleIcon className="h-5 w-5 text-black" />
+                  <Typography
+                    color="gray"
+                    className="text-sm font-normal text-blue-gray-500"
+                  >
+                    You can view both the exact time and address where you marked your attendance.
+                  </Typography>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowRightCircleIcon className="h-5 w-5 text-black" />
+                  <Typography
+                    color="gray"
+                    className="text-sm font-normal text-blue-gray-500"
+                  >
+                    If you forget to clock out, the Clock Out Time will be displayed as "Not Clocked Yet".
+                  </Typography>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowRightCircleIcon className="h-5 w-5 text-black" />
+                  <Typography
+                    color="gray"
+                    className="text-sm font-normal text-blue-gray-500"
+                  >
+                    Attendance logs are updated in real-time and provide accurate details about your working hours.
+                  </Typography>
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogHeader>
 
         <DialogBody>
-          <div className="bg-white mb-0 p-0 border-radius">
+          <div className="bg-gray-100 mb-0 p-4 rounded-lg shadow-lg">
             {updatedAttendanceLogs && updatedAttendanceLogs.length > 0 ? (
-              <ul className="space-y-4">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {updatedAttendanceLogs.map((log, index) => (
-                  <li key={log._id || index} className="border text-black p-3 rounded-lg shadow-sm">
-                    <h3 className="font-bold text-lg mb-2">
-                      {log.attendanceMarkDate}
-                    </h3>
-                    <p>
-                      <strong>EmployeeId:</strong> {log.Employee_Id}
-                    </p>
-                    <p>
-                      <strong>Clock In Time:</strong> {log.clockInTime}
-                    </p>
-                    <p>
-                      <strong>Clock In Address:</strong> {log.clockInAddress}
-                    </p>
-                    <p>
-                      <strong>Clock Out Time:</strong> {log.clockOutTime || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Clock Out Address:</strong> {log.clockOutAddress || "N/A"}
-                    </p>
+                  <li
+                    key={log._id || index}
+                    className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-2 rounded-t-lg">
+                      <h3 className="text-lg font-bold text-white">
+                        {log.attendanceMarkDate}
+                      </h3>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm font-medium text-gray-700">
+                        <strong className="block text-gray-900">Employee ID: {log.Employee_Id}</strong>
+                      </p>
+                      <p className="text-sm font-medium text-gray-700 mt-2">
+                        <strong className="block text-gray-900">Clock In Time:</strong>
+                        {log.clockInTime}
+                      </p>
+                      <p className="text-sm font-medium text-gray-700 mt-2">
+                        <strong className="block text-gray-900">Clock In Address:</strong>
+                        {log.clockInAddress}
+                      </p>
+                      <p className="text-sm font-medium text-gray-700 mt-2">
+                        <strong className="block text-gray-900">Clock Out Time:</strong>
+                        {log.clockOutTime || "N/A"}
+                      </p>
+                      <p className="text-sm font-medium text-gray-700 mt-2">
+                        <strong className="block text-gray-900">Clock Out Address:</strong>
+                        {log.clockOutAddress || "N/A"}
+                      </p>
+                    </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>No attendance logs available.</p>
+              <div className="text-center text-gray-600 py-4">
+                <p className="text-lg font-medium">No attendance logs available.</p>
+                <p className="text-sm">Please check back later.</p>
+              </div>
             )}
           </div>
         </DialogBody>
-
       </Dialog>
-
     </>
   );
 };
