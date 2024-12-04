@@ -57,6 +57,31 @@ const ClockInOut = () => {
     const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
     return todayDate;
   };
+  function formatStandardTime(isoString) {
+    if (!isoString || isoString === "N/A") {
+      return "NA"; // Return 'NA' for invalid or missing input
+    }
+  
+    const date = new Date(isoString);
+  
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return "NA";
+    }
+  
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+  
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convert 0 hour to 12 for AM/PM
+  
+    return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+  }
 
   useEffect(() => {
     const { clockInTime, clockOutTime, clockInAddress, attendanceMarkDate } = updatedAttendanceLogs.length > 0 ? updatedAttendanceLogs[updatedAttendanceLogs.length - 1] : {};
@@ -154,7 +179,7 @@ const ClockInOut = () => {
 
             // Create the log object for API
             const clockInlog = {
-              clockInTime: currentTime.toLocaleString(),
+              clockInTime: currentTime,
               clockInAddress: fetchedAddress,
               clockInLatitude: latitude,
               clockInLongitude: longitude,
@@ -214,8 +239,8 @@ const ClockInOut = () => {
           setClockOutLongitude(longitude);
 
           const newLog = {
-            clockInTime: clockInTime?.toLocaleString(),
-            clockOutTime: currentTime.toLocaleString(),
+            clockInTime: clockInTime,
+            clockOutTime: currentTime,
             clockInAddress: address,
             clockOutAddress: fetchedAddress,
             clockInLatitude: clockInLatitude,
@@ -518,11 +543,12 @@ const ClockInOut = () => {
                     </div>
                     <div className="p-4">
                       <p className="text-sm font-medium text-gray-700">
-                        <strong className="block text-gray-900">Employee ID: {log.Employee_Id}</strong>
+                        <strong className="block text-gray-900">Employee ID: 
+                        {log.Employee_Id}</strong>
                       </p>
                       <p className="text-sm font-medium text-gray-700 mt-2">
                         <strong className="block text-gray-900">Clock In Time:</strong>
-                        {log.clockInTime}
+                        {formatStandardTime(log.clockInTime)}
                       </p>
                       <p className="text-sm font-medium text-gray-700 mt-2">
                         <strong className="block text-gray-900">Clock In Address:</strong>
@@ -530,7 +556,7 @@ const ClockInOut = () => {
                       </p>
                       <p className="text-sm font-medium text-gray-700 mt-2">
                         <strong className="block text-gray-900">Clock Out Time:</strong>
-                        {log.clockOutTime || "N/A"}
+                        {formatStandardTime(log.clockOutTime || "N/A")}
                       </p>
                       <p className="text-sm font-medium text-gray-700 mt-2">
                         <strong className="block text-gray-900">Clock Out Address:</strong>

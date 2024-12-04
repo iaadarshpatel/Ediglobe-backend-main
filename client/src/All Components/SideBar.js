@@ -47,6 +47,17 @@ const SideBar = ( ) => {
     navigate('/Employeelogin', { replace: true });
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 960) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const customColor = '#000000';
 

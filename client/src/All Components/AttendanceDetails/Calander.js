@@ -79,17 +79,18 @@ const fetcher = (url) =>
 
     if (storedEmployeeId) {
       setEmployeeId(storedEmployeeId);
-      if (storedData) {
+      try {
         const parsedData = JSON.parse(storedData);
-        const employeeRecords = parsedData.filter(item => item.Employee_Id === storedEmployeeId);
-
-        // Merge all attendance records from different months into one object
-        const mergedAttendance = employeeRecords.reduce((acc, record) => {
-          const { Employee_Id, Name, ...attendance } = record;
-          return { ...acc, ...attendance };
-        }, {});
-
-        setAttendanceMap(mergedAttendance); // Set the merged attendance data
+      
+        // Ensure parsedData is an array
+        if (Array.isArray(parsedData)) {
+          const employeeRecords = parsedData.filter(item => item.Employee_Id === storedEmployeeId);
+          console.log(employeeRecords);
+        } else {
+          console.error("Parsed data is not an array. Check the structure of storedData:", parsedData);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON data:", error.message);
       }
     } else {
       console.error('No employee ID found. Please log in again.');

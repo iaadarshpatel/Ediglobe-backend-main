@@ -473,7 +473,7 @@ const LeadsDistribution = () => {
                               </Typography>
                             </td>
                             <td className="p-3">
-                              <Typography variant="small" color='blue-gray' className="font-normal">{degree}
+                              <Typography variant="small" color='blue-gray' className="font-normal w-24 whitespace-normal break-words">{degree}
                               </Typography>
                             </td>
                             <td className="p-3">
