@@ -1,5 +1,5 @@
 import React from 'react';
-import SideBar from '../SideBar';
+import SideBar from '../Roles/SideBar';
 import { Card } from '@material-tailwind/react';
 import LottieFile from '../LottieFile';
 import EmojiAttendance from './EmojiAttendance';

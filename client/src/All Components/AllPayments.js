@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
-import SideBar from "./SideBar";
+import React, { useState, useEffect } from 'react'
+import SideBar from '../All Components/Roles/SideBar';
 import LottieFile from './LottieFile';
 import './style.css';
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import { Card, Input, Typography, CardBody, Chip, } from "@material-tailwind/react";
 import useSWR from 'swr';
 import config from "../config.js";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../All Components/redux/slice/employeeSlice.js";
 
 const TABLE_HEAD = ["Student Name", "Date", "Contact", "Amount Pitched", "Amount Paid", "Partial Received", "Amount Due", "Last Date", "Ob Form", "Domain", "Payment Status"];
 
@@ -23,7 +25,11 @@ const AllPayments = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState('All');
 
-  const Employee_Id = localStorage.getItem('employeeId');
+  const dispatch = useDispatch();
+  const allDetails = useSelector(state => state.employeesDetails);
+
+  const { Employee_Id } = allDetails.data || {};
+
   const token = localStorage.getItem("Access Token")
   const fetcher = (url) => fetch(url, {
     headers: {
@@ -31,6 +37,11 @@ const AllPayments = () => {
     }
   }).then((res) => res.json());
   const { data, error } = useSWR(`${config.hostedUrl}/payment/allpayments/${Employee_Id}`, fetcher);
+
+  // Fetch employee details on component mount
+  useEffect(() => {
+    dispatch(fetchEmployeesDetails());
+  }, [dispatch]);
 
   const monthlySales = data?.monthlyCount || "Loading...";
   const totalObMonths = data?.totalMonths || [];
@@ -93,7 +104,7 @@ const AllPayments = () => {
       'DD/MM/YYYY HH:mm:ss',
       'DD/MM/YYYY',
       'MM/YYYY/DD',
-      'DD/MM/YYYY, HH:mm:ss', 
+      'DD/MM/YYYY, HH:mm:ss',
     ];
 
     // Attempt to parse the date string using the recognized formats
@@ -116,7 +127,7 @@ const AllPayments = () => {
           date = new Date(`${parts[1]}-${parts[0]}-${parts[2]}`); // Convert to YYYY-MM-DD
           break;
         }
-      }  else if (format === 'MM/DD/YYYY' || format === 'MM/DD/YYYY HH:mm:ss') {
+      } else if (format === 'MM/DD/YYYY' || format === 'MM/DD/YYYY HH:mm:ss') {
         if (parts.length === 3) {
           date = new Date(`${parts[1]}-${parts[0]}-${parts[2]}`); // Convert to YYYY-MM-DD
           break;
@@ -146,7 +157,7 @@ const AllPayments = () => {
 
     // Console log the result in DD/MM/YYYY format
     const formattedDate = `${day}/${month}/${year}`;
-    return formattedDate; 
+    return formattedDate;
   }
 
   if (error) return <div>Error loading data</div>;
@@ -383,21 +394,21 @@ const AllPayments = () => {
                                 variant="small"
                                 color="blue-gray"
                                 className={`font-bold text-xs text-center border border-black rounded-md px-2 py-1 ${payment.payment_status === 'PAID' ? 'bg-green-500 text-white' :
-                                    payment.payment_status === 'NOT INTERESTED' ? 'bg-red-200 text-black' :
-                                      payment.payment_status === 'NO RESPONSE' ? 'bg-yellow-200 text-black' :
-                                        payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' : 
-                                          payment.payment_status === 'REFUND' ? 'bg-red-500 text-white' :
-                                            payment.payment_status === 'MORE TIME REQ.' ? 'bg-blue-200 text-black' :
-                                              payment.payment_status === 'WRONG PITCH' ? 'bg-brown-700 text-white' :
-                                                payment.payment_status === 'PARTIAL PAYMENT' ? 'bg-green-200 text-black' :
-                                                  payment.payment_status === 'SPAM' ? 'bg-gray-400 text-black' :
-                                                    payment.payment_status === 'Will update' ? 'bg-purple-200 text-black' :
+                                  payment.payment_status === 'NOT INTERESTED' ? 'bg-red-200 text-black' :
+                                    payment.payment_status === 'NO RESPONSE' ? 'bg-yellow-200 text-black' :
+                                      payment.payment_status === 'College Issue' ? 'bg-orange-200 text-black' :
+                                        payment.payment_status === 'REFUND' ? 'bg-red-500 text-white' :
+                                          payment.payment_status === 'MORE TIME REQ.' ? 'bg-blue-200 text-black' :
+                                            payment.payment_status === 'WRONG PITCH' ? 'bg-brown-700 text-white' :
+                                              payment.payment_status === 'PARTIAL PAYMENT' ? 'bg-green-200 text-black' :
+                                                payment.payment_status === 'SPAM' ? 'bg-gray-400 text-black' :
+                                                  payment.payment_status === 'Will update' ? 'bg-purple-200 text-black' :
                                                     payment.payment_status === 'College Issue' ? 'bg-pink-200 text-black' :
-                                                    payment.payment_status === 'DEMO' ? 'bg-purple-200 text-black' :
-                                                      'bg-black text-white'  // Default to black background with white text
+                                                      payment.payment_status === 'DEMO' ? 'bg-purple-200 text-black' :
+                                                        'bg-black text-white'  // Default to black background with white text
                                   }`}
                               >
-                               {payment.payment_status || 'Not Updated yet'}
+                                {payment.payment_status || 'Not Updated yet'}
                               </Typography>
                             </td>
                           </tr>

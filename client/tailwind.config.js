@@ -10,5 +10,15 @@ module.exports = withMT({
       fontFamily: {
         'typo-round-thin': ['"Typo Round Thin Demo"', 'sans-serif'],
       },
+      colors: {
+        black: '#000000', 
+        customGray: '#263238',
+      },
+      ringColor: {
+        DEFAULT: '#000000', // Sets the default ring color to black
+      },
+      borderColor: {
+        DEFAULT: '#000000', // Set the default border color to black
+      },
     }
 });

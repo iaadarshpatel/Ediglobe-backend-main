@@ -1,6 +1,6 @@
 import React from 'react'
 import LottieFile from '../LottieFile'
-import SideBar from '../SideBar'
+import SideBar from '../Roles/SideBar';
 import { Card, Typography } from '@material-tailwind/react'
 import Tree from './Tree'
 

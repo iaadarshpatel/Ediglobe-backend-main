@@ -3,7 +3,7 @@ import axios from "axios";
 import { Hourglass } from "react-loader-spinner";
 import { Chip, Typography } from '@material-tailwind/react';
 import { useNavigate } from "react-router-dom";
-import SideBar from "./SideBar";
+import SideBar from '../All Components/Roles/SideBar';
 import Typewriter from 'typewriter-effect';
 import LottieFile from "./LottieFile";
 import useSWR from 'swr';
@@ -108,7 +108,6 @@ const CheckPayments = () => {
     if (!isLoggedIn) {
       navigate('/Employeelogin', { replace: true }); // Redirect if not logged in
     } else {
-      // Show toast message after successful login
       setShowToast(true); // Show the toast message when logged in
     }
   }, [navigate]);

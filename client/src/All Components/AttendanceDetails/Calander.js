@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import config from '../../config.js';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../redux/slice/employeeSlice";
 
 const AttendanceShortForm = {
   "P": "Present",
@@ -37,9 +39,8 @@ const AttendanceColors = {
   "IC": "text-purple-500",
 };
 
-
 const SkeletonLoader = () => {
-  const cellSize = "h-16 w-full"; // Replace h-16 with the height you used in the calendar
+  const cellSize = "h-16 w-full";
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 lg:p-4 bg-black text-white rounded-border w-[95%] md:w-[90%] lg:w-[80%] h-[100%]">
       <div className="grid grid-cols-7 gap-2 mt-2">
@@ -57,21 +58,30 @@ const Calendar = () => {
   const [attendanceMap, setAttendanceMap] = useState({});
   const [employeeId, setEmployeeId] = useState(null);
 
+  const dispatch = useDispatch();
+  const allDetails = useSelector(state => state.employeesDetails);
+
+  const { Employee_Id } = allDetails.data || {};
+
   const token = localStorage.getItem("Access Token");
 
-const fetcher = (url) =>
-  fetch(url, {
-    headers: {
-      Authorization: token,
-    },
-  }).then((res) => res.json());
+  const fetcher = (url) =>
+    fetch(url, {
+      headers: {
+        Authorization: token,
+      },
+    }).then((res) => res.json());
 
   const { data, error } = useSWR(`${config.hostedUrl}/attendanceDetails/attendance`, fetcher, {
-    refreshInterval: 4000,
     onSuccess: (fetchedData) => {
       localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
     }
   });
+
+   // Fetch employee details on component mount
+   useEffect(() => {
+    dispatch(fetchEmployeesDetails());
+  }, [dispatch]);
 
   useEffect(() => {
     const storedEmployeeId = localStorage.getItem('employeeId');
@@ -79,26 +89,31 @@ const fetcher = (url) =>
 
     if (storedEmployeeId) {
       setEmployeeId(storedEmployeeId);
-      try {
+      if (storedData) {
         const parsedData = JSON.parse(storedData);
-      
-        // Ensure parsedData is an array
-        if (Array.isArray(parsedData)) {
-          const employeeRecords = parsedData.filter(item => item.Employee_Id === storedEmployeeId);
-          console.log(employeeRecords);
-        } else {
-          console.error("Parsed data is not an array. Check the structure of storedData:", parsedData);
-        }
-      } catch (error) {
-        console.error("Error parsing JSON data:", error.message);
+        const employeeRecords = parsedData.filter(item => item.Employee_Id === storedEmployeeId);
+
+        // Merge all attendance records from different months into one object
+        const mergedAttendance = employeeRecords.reduce((acc, record) => {
+          const { Employee_Id, Name, ...attendance } = record;
+          return { ...acc, ...attendance };
+        }, {});
+
+        setAttendanceMap(mergedAttendance); 
       }
     } else {
       console.error('No employee ID found. Please log in again.');
     }
   }, [data]);
 
+
   if (error) return <div>Failed to load</div>;
-  if (!data && !localStorage.getItem('attendanceData')) return <div><SkeletonLoader /></div>;
+  if (!data && !localStorage.getItem('attendanceData')) {
+    console.log("Data:", data);
+    console.log("LocalStorage attendanceData:", localStorage.getItem('attendanceData'));
+    return <div><SkeletonLoader /></div>;
+  }
+  
 
   const daysInMonth = currentMonth.daysInMonth();
   const firstDayOfMonth = currentMonth.startOf('month').day();
@@ -150,6 +165,7 @@ const fetcher = (url) =>
       </div>
 
       {/* Calendar days */}
+
       <div className="grid grid-cols-7 gap-2 mt-2">
         {Array.from({ length: firstDayOfMonth }, (_, i) => (
           <div key={i}></div>

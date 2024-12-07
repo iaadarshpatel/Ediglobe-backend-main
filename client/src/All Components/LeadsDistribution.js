@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import SideBar from './SideBar';
+import React, { useState, useEffect, useCallback } from 'react';
+import SideBar from './Roles/SideBar.js';
 import LottieFile from './LottieFile';
 import { Card, CardBody, Input, Typography, Button, Chip, DialogBody, DialogFooter, Dialog, DialogHeader } from '@material-tailwind/react';
 import { MagnifyingGlassIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid';
@@ -8,6 +8,8 @@ import SkeletonLoader from './SkeltonPgfl';
 import config from '../config.js';
 import axios from 'axios';
 import Page404 from './Page404';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../All Components/redux/slice/employeeSlice.js";
 
 const statusOptions = [
   { value: '', label: 'Select Status' },
@@ -44,15 +46,19 @@ const LeadsDistribution = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const [openNote, setOpenNote] = React.useState(false);
+
+  const dispatch = useDispatch();
+  const allDetails = useSelector(state => state.employeesDetails);
+  const { Employee_Id } = allDetails.data || {};
 
   const handleOpen = () => setOpen(!open);
+  const handleOpenNote = () => setOpenNote(!openNote);
 
-  const employeeId = localStorage.getItem('employeeId');
   const token = localStorage.getItem("Access Token");
 
   const handleNoteChange = (event, leadId) => {
     const updatedNote = event.target.value;
-
     setUpdatedLeads((prev) => ({
       ...prev,
       [leadId]: {
@@ -68,26 +74,23 @@ const LeadsDistribution = () => {
     }
   }).then((res) => res.json());
   const { data, error } = useSWR(`${config.hostedUrl}/leadsDistribute/pgfl`, fetcher, {
-    refreshInterval: 4000,
   });
+  
+  // Fetch employee details on component mount
+  useEffect(() => {
+    dispatch(fetchEmployeesDetails());
+  }, [dispatch]);
 
-  const fetchMatchedLeads = async () => {
+  const fetchMatchedLeads = useCallback(async () => {
     try {
       const token = localStorage.getItem("Access Token");
-      const { data: leads } = await axios.get(`${config.hostedUrl}/leads/fetchLeads`, {
+      const { data: leads } = await axios.get(`${config.hostedUrl}/leads/fetchLeads/${Employee_Id}`, {
         headers: {
           Authorization: token
         }
       });
-      // Get the current employee ID from localStorage or other sources
-      const employeeId = localStorage.getItem('employeeId');
-
-      // Filter leads by employee_id
-      const filteredLeads = leads.filter(lead => lead.employee_id === employeeId);
-
-      // Store the filtered leads in state
-      setMatchedLeads(filteredLeads);
-
+      setMatchedLeads(leads);
+  
       // Set disabled state for leads that have non-empty statuses
       const disabledLeadsMap = leads.reduce((acc, lead) => {
         if (lead.status) { // If the lead status is not empty
@@ -96,19 +99,19 @@ const LeadsDistribution = () => {
         return acc;
       }, {});
       setDisabledLeads(disabledLeadsMap);
-
+  
       // Store the disabled leads in localStorage
       localStorage.setItem('disabledLeads', JSON.stringify(disabledLeadsMap));
-
     } catch (error) {
       console.error('Error fetching matched leads:', error.message);
     }
-  };
+  }, [Employee_Id]); // Memoize based on Employee_Id
+  
 
   // Load disabledLeads from localStorage and fetch matched leads when the component mounts
   useEffect(() => {
     fetchMatchedLeads();
-  }, []);
+  }, [fetchMatchedLeads]);
 
   //Filter leads on multiple select
   const handleDropdownChange = (event) => {
@@ -125,7 +128,7 @@ const LeadsDistribution = () => {
       const matchedStatus = matchedLead ? matchedLead.status : undefined;
 
       return (
-        row.employee_id === employeeId &&
+        row.employee_id === Employee_Id &&
         (row.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           row.email.toLowerCase().includes(searchQuery.toLowerCase())) &&
         (selectedStatus === '' ||
@@ -158,7 +161,6 @@ const LeadsDistribution = () => {
             college,
           },
         };
-        console.log('Updated leads:', newUpdatedLeads);
 
         // Also update matchedLeads if needed
         // setMatchedLeads((prevLeads) =>
@@ -204,7 +206,6 @@ const LeadsDistribution = () => {
   const handleSave = async () => {
     const invalidStatusLead = Object.values(updatedLeads).find(lead => lead.status === "Select Status");
     console.log("Invalid Status Lead:", invalidStatusLead);
-
     if (invalidStatusLead) {
       alert("Error: Please select a valid status for all leads before saving.");
       return;
@@ -255,7 +256,6 @@ const LeadsDistribution = () => {
       setSaving(false);
     }
     fetchMatchedLeads();
-    console.log(leadsToSave);
   };
 
   const refreshData = async () => {
@@ -272,9 +272,18 @@ const LeadsDistribution = () => {
   };
 
   const handleSaveAndRefresh = async () => {
-    await handleSave(); // Your existing save function
-    await refreshData(); // Refresh data after saving
+    try {
+      // setSaving(true); 
+      await handleSave(); // Save data
+      await refreshData(); // Refresh data
+    } catch (error) {
+      console.error("Error in save and refresh:", error);
+      alert("An error occurred while saving and refreshing data. Please try again.");
+    } finally {
+      setSaving(false); // Ensure saving state is reset
+    }
   };
+  
 
   if (error) return <div><Page404 /></div>;
 
@@ -337,7 +346,7 @@ const LeadsDistribution = () => {
                       <p className="text-sm sm:text-base">{lead.student_name}</p>
                       <p className="text-sm sm:text-base">{lead.email}</p>
                       <p className="text-sm sm:text-base">
-                      {lead.contact ? lead.contact : "No Contact"}</p>
+                        {lead.contact ? lead.contact : "No Contact"}</p>
                       <p className="text-sm sm:text-base">{lead.contact1}</p>
                       <p className="text-sm sm:text-base">{lead.contact2}</p>
                       <p className="text-sm sm:text-base">{lead.course1}</p>
@@ -502,13 +511,46 @@ const LeadsDistribution = () => {
                                 </select>
 
                                 {(updatedLeads[id]?.status === "Follow Up" || updatedLeads[id]?.status === "Not Interested" || status === "Follow Up" || status === "Not Interested") && (
-                                  <textarea
-                                    className="w-24 h-8 text-sm p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                                    placeholder="Note"
-                                    value={updatedLeads[id]?.note || ''}
-                                    onChange={(event) => handleNoteChange(event, id)}
-                                  />
+                                  <>
+                                  <button
+                                    className='text-white bg-black hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-800' onClick={handleOpenNote} variant="gradient">
+                                    Add Note
+                                  </button>
+                                  <Dialog
+                                  open={openNote}
+                                  handler={handleOpenNote}
+                                  animate={{
+                                    mount: { scale: 1, y: 0 },
+                                    unmount: { scale: 0.9, y: -100 },
+                                    }} 
+                                  transition={{ duration: 0.1 }} 
+                                >
+                                  <DialogHeader>Add your Note here.</DialogHeader>
+                                  <DialogBody className="max-h-[500px] overflow-y-auto">
+                                    <textarea
+                                      className="w-full h-14 text-sm p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                      placeholder="Note"
+                                      value={updatedLeads[id]?.note || ''}
+                                      onChange={(event) => handleNoteChange(event, id)}
+                                    />
+                                  </DialogBody>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="text"
+                                      color="red"
+                                      onClick={() => handleOpenNote(null)}
+                                      className="mr-1"
+                                    >
+                                      <span>Cancel</span>
+                                    </Button>
+                                    <Button onClick={handleSaveAndRefresh} className="bg-black text-white p-3 w-32" disabled={saving}>
+                                      {saving ? 'Saving...' : 'Update Leads'}
+                                    </Button>
+                                  </DialogFooter>
+                                </Dialog>
+                                  </>
                                 )}
+                                
 
                                 {(disabledLeads[id]) && (
                                   <div className="inline-flex items-center">

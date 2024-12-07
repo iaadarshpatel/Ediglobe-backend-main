@@ -3,27 +3,32 @@ import axios from "axios";
 import config from "../../config.js";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import MarkerIcon from "../../assets/marker.gif";
-import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
+import { Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
 import { BsClockHistory } from "react-icons/bs";
-import { ArrowRightCircleIcon } from '@heroicons/react/24/solid'
+import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../redux/slice/employeeSlice";
 
 const ClockInOut = () => {
-  const [loader, setLoader] = useState({ punching: false, fetching: false });
+  const [loader, setLoader] = useState({ punching: false, fetching: true });
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState(null);
   const [address, setAddress] = useState("");
   const [todayDay, setTodayDay] = useState("");
-  // const [logs, setLogs] = useState([]);
   const [updatedAttendanceLogs, setUpdatedAttendanceLogs] = useState([]);
   const [clockInLatitude, setClockInLatitude] = useState(null);
   const [clockInLongitude, setClockInLongitude] = useState(null);
   const [clockOutLatitude, setClockOutLatitude] = useState(null);
   const [clockOutLongitude, setClockOutLongitude] = useState(null);
   const [showMap, setShowMap] = useState(false);
+
   const [size, setSize] = useState(false);
   const handleOpen = (value) => setSize(value);
+  
+  const dispatch = useDispatch();
+  const allDetails = useSelector(state => state.employeesDetails);
+  const { Employee_Id } = allDetails.data || {};
 
-  const Employee_Id = localStorage.getItem('employeeId');
   const token = localStorage.getItem("Access Token");
 
   const targetLocation = {
@@ -31,9 +36,15 @@ const ClockInOut = () => {
     lng: 77.6421465,
   };
 
+   // Fetch employee details on component mount
+   useEffect(() => {
+    dispatch(fetchEmployeesDetails());
+  }, [dispatch]);
+
   // Data from api
   useEffect(() => {
     const fetchEmployeeAttendanceLogs = async () => {
+      if (!Employee_Id || !token) return; // Skip API call if either Employee_Id or token is missing.
       try {
         setLoader((prevLoader) => ({ ...prevLoader, fetching: true }));
         const response = await axios.get(`${config.hostedUrl}/attendanceLogs/${Employee_Id}`, {
@@ -42,7 +53,6 @@ const ClockInOut = () => {
           },
         });
         setUpdatedAttendanceLogs(response.data);
-        // setLogs(response.data);
       } catch (error) {
         console.error("Error fetching employee attendance logs:", error);
       } finally {
@@ -51,7 +61,7 @@ const ClockInOut = () => {
     };
     fetchEmployeeAttendanceLogs();
   }, [Employee_Id, token]);
-
+  
   const formatDateTime = () => {
     const date = new Date();
     const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
@@ -87,7 +97,6 @@ const ClockInOut = () => {
     const { clockInTime, clockOutTime, clockInAddress, attendanceMarkDate } = updatedAttendanceLogs.length > 0 ? updatedAttendanceLogs[updatedAttendanceLogs.length - 1] : {};
     const isClockedIn = !!clockInTime;
     const isClockedOut = isClockedIn && !!clockOutTime;
-    // const savedLogs = JSON.parse(localStorage.getItem("clockLogs")) || [];
 
     if (!isClockedIn && !isClockedOut) {
       setIsClockedIn(false);
@@ -103,7 +112,6 @@ const ClockInOut = () => {
       setIsClockedIn(false);
       setTodayDay(attendanceMarkDate || formatDateTime());
     }
-    // setLogs(savedLogs);
   }, [updatedAttendanceLogs]);
 
   const { isLoaded } = useJsApiLoader({
@@ -152,8 +160,8 @@ const ClockInOut = () => {
           // Calculate distance between user's location and target location
           const distance = calculateDistance(latitude, longitude, targetLocation.lat, targetLocation.lng);
 
-          // Check if user is within the 3000-meter threshold
-          if (distance <= 12000) {
+          // Check if user is within the 1300-meter threshold
+          if (distance <= 1300) {
 
             // Fetch the address of the current location
             const fetchedAddress = await fetchAddress(latitude, longitude);
@@ -165,14 +173,6 @@ const ClockInOut = () => {
             setAddress(fetchedAddress);
             setClockInLatitude(latitude);
             setClockInLongitude(longitude);
-
-            // Save data to localStorage
-            // localStorage.setItem("isClockedIn", "true");
-            // localStorage.setItem("clockInTime", currentTime.toISOString());
-            // localStorage.setItem("clockInAddress", fetchedAddress);
-            // localStorage.setItem("attendanceMarkDate", formattedDate);
-            // localStorage.setItem("clockInLatitude", latitude);
-            // localStorage.setItem("clockInLongitude", longitude);
 
             handleOpen("xl");
             setShowMap(true);
@@ -198,11 +198,9 @@ const ClockInOut = () => {
                 },
               });
 
-              // Update logs in state and localStorage
+              // Update logs in state
               const updatedLogs = [...updatedAttendanceLogs, clockInlog];
-              // setLogs(updatedLogs);
               setUpdatedAttendanceLogs(updatedLogs);
-              // localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
             } catch (error) {
               console.error("Error saving log:", error);
               alert("Failed to save log. Please try again.");
@@ -264,10 +262,8 @@ const ClockInOut = () => {
             const updatedLogs = [...updatedAttendanceLogs, newLog];
             // setLogs(updatedLogs);
             setUpdatedAttendanceLogs(updatedLogs);
-            // localStorage.setItem("clockLogs", JSON.stringify(updatedLogs));
 
             // Clear clock-in state
-            // localStorage.setItem("isClockedIn", "false");
             setIsClockedIn(false);
             resetClockInState();
           } catch (error) {
@@ -293,17 +289,6 @@ const ClockInOut = () => {
     setClockInLongitude(null);
     setClockOutLatitude(null);
     setClockOutLongitude(null);
-
-    // Clear local storage
-    // localStorage.removeItem("isClockedIn");
-    // localStorage.removeItem("clockInTime");
-    // localStorage.removeItem("clockInAddress");
-    // localStorage.removeItem("attendanceMarkDate");
-    // localStorage.removeItem("clockLogs");
-    // localStorage.removeItem("clockInLatitude");
-    // localStorage.removeItem("clockInLongitude");
-    // localStorage.removeItem("clockOutLatitude");
-    // localStorage.removeItem("clockOutLongitude");
   };
 
   const mapContainerStyle = {
@@ -334,11 +319,47 @@ const ClockInOut = () => {
   const customIcon = {
     url: MarkerIcon,
   };
+
+  const SkeletonCard = () => {
+    return (
+      <div className="w-full lg:full flex justify-end">
+        <div className="w-full lg:w-3/5 rounded-lg border border-gray-600 py-2 px-2 bg-gray-200 animate-pulse">
+          {/* Top Section */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="h-4 bg-gray-400 rounded w-3/5"></div>
+            <div className="h-4 bg-gray-400 rounded w-1/4"></div>
+          </div>
+  
+          {/* Middle Section */}
+          <div className="flex mb-2">
+            <div className="bg-gray-400 rounded-full h-7 w-7"></div>
+            <div className="flex flex-col gap-2 ml-3 w-full">
+              <div className="h-4 bg-gray-400 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-400 rounded w-3/4"></div>
+            </div>
+          </div>
+  
+          {/* Conditional Section */}
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-400 rounded w-full"></div>
+            <div className="h-4 bg-gray-400 rounded w-2/3"></div>
+          </div>
+  
+          {/* Buttons */}
+          <div className="flex gap-2 mt-3">
+            <div className="h-10 bg-gray-400 rounded w-3/4"></div>
+            <div className="h-10 bg-gray-400 rounded w-1/4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <>
       <div className="w-full lg:w-1/2 flex justify-end">
-        {loader.fetching ?
-          <Chip color='indigo' value="Loading Attendance..." className='normal-case text-white bg-black font-bold inline-block pt-2 ml-1' />
+        {loader.fetching ? 
+          <SkeletonCard/>
           : (
             <Card className="w-full lg:w-3/5 rounded-lg border border-gray-300 py-2 px-2">
               <Typography className="flex justify-between items-center mb-1 text-gray-600 text-xs font-normal">

@@ -8,6 +8,8 @@ import { LuPalmtree } from 'react-icons/lu';
 import useSWR from 'swr';
 import config from "../../config.js";
 import Map from "./Map.js";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeesDetails } from "../redux/slice/employeeSlice";
 
 const customColor = '#000000';
 
@@ -96,7 +98,10 @@ const EmojiAttendance = () => {
     const [attendanceData, setAttendanceData] = useState([]);
     const [monthlyCounts, setMonthlyCounts] = useState({});
     const [selectedMonth, setSelectedMonth] = useState('');
-    const storedEmployeeId = localStorage.getItem('employeeId');
+
+    const dispatch = useDispatch();
+    const allDetails = useSelector(state => state.employeesDetails);
+    const { Employee_Id } = allDetails.data || {};
 
     const token = localStorage.getItem("Access Token");
 
@@ -112,6 +117,11 @@ const EmojiAttendance = () => {
             localStorage.setItem('attendanceData', JSON.stringify(fetchedData));
         }
     });
+
+    // Fetch employee details on component mount
+    useEffect(() => {
+        dispatch(fetchEmployeesDetails());
+    }, [dispatch]);
 
     const SkeletonItem = () => (
         <div className="flex items-center gap-3 rounded-lg py-2 animate-pulse">
@@ -143,9 +153,9 @@ const EmojiAttendance = () => {
                     parsedData = Object.values(parsedData); // Convert non-array object to array
                 }
 
-                // Filter data based on storedEmployeeId
-                const filteredData = storedEmployeeId
-                    ? parsedData?.filter((item) => item.Employee_Id === storedEmployeeId)
+                // Filter data based on Employee_Id
+                const filteredData = Employee_Id
+                    ? parsedData?.filter((item) => item.Employee_Id === Employee_Id)
                     : parsedData;
 
                 // Create a flat array from the attendance data
@@ -194,7 +204,7 @@ const EmojiAttendance = () => {
         } catch (err) {
             console.error('Error in useEffect:', err.message);
         }
-    }, [data, storedEmployeeId]);
+    }, [data, Employee_Id]);
 
     if (error) return <div>Error loading attendance data</div>;
 
@@ -266,10 +276,10 @@ const EmojiAttendance = () => {
                     </div>
                 </div>
                 {/* Right Section */}
-                <Map/>
+                <Map />
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex gap-4">
                 <Typography variant="md" color="blue-gray" className="whitespace-nowrap font-normal">
                     Select Month:
                 </Typography>
@@ -286,22 +296,22 @@ const EmojiAttendance = () => {
                         </option>
                     ))}
                 </select>
-            </div>
-            <hr className="my-2 border-black-gray-50" />
-            <div className="mt-2">
-                <div className="flex justify-end">
+                <div className="ml-auto flex items-center">
                     <Switch color="blue-gray" label={
                         <div className="flex items-center gap-2">
                             <Typography className="font-medium text-black">
-                                {isVisible ? 'Hide' : 'Show'} Details
+                                {isVisible ? 'Hide' : 'Show'}
                             </Typography>
                         </div>
                     }
-                        className={`${isVisible ? 'bg-teal-500' : 'bg-red-500'}`}
+                        className={`${isVisible ? 'bg-gray' : 'bg-black'}`}
                         onChange={toggleVisibility}
                         checked={isVisible}
                     />
                 </div>
+            </div>
+            <hr className="my-2 border-black-gray-50" />
+            <div className="mt-2">
                 {isVisible && (
                     <div>
                         <ul className={`grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 transition-opacity duration-300 ${isVisible ? '' : 'opacity-50 blur-sm'}`}>

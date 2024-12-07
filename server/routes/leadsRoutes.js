@@ -1,10 +1,10 @@
 import { Router } from "express";
-import {fetchLeadsDetails, updateLeadsDetails} from "../controllers/leadsDetails.js";
+import {fetchLeadsDetailsById, updateLeadsDetails} from "../controllers/leadsDetails.js";
 import authenticate from "../middleware/authenticate.js";
 
 const router = Router();  
 
-router.get('/fetchLeads', authenticate, fetchLeadsDetails);
+router.get('/fetchLeads/:id', authenticate, fetchLeadsDetailsById);
 router.post('/updateLead', authenticate, updateLeadsDetails);
 
 export default router;  

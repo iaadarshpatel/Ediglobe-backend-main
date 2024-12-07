@@ -1,10 +1,11 @@
 import LeadList from "../models/Leads.js";
 
-const fetchLeadsDetails = async (req, res) => {
-    console.log('Fetching leads...');
+const fetchLeadsDetailsById = async (req, res) => {
+    const employeeId = req.params.id;
     try {
-        const leads = await LeadList.find(); // Fetch all leads from the database
-        res.json(leads); // Send the leads back in the response
+        const leads = await LeadList.find({ employee_id: employeeId })
+        .sort({ updatedAt: 1 });;
+        res.json(leads);
     } catch (err) {
         console.error('Error fetching leads:', err);
         res.status(500).json({ error: 'Failed to fetch leads' });
@@ -41,4 +42,4 @@ const updateLeadsDetails = async (req, res) => {
     }
 }
 
-export { fetchLeadsDetails, updateLeadsDetails };
+export { fetchLeadsDetailsById, updateLeadsDetails };

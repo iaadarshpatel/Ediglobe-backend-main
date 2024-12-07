@@ -1,6 +1,6 @@
 import React from 'react';
 import LottieFile from './LottieFile';
-import SideBar from './SideBar';
+import SideBar from '../All Components/Roles/SideBar';
 import { Card, CardBody, Chip, Typography } from '@material-tailwind/react';
 import Page404 from './Page404';
 
