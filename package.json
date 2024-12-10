@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "primereact": "^10.8.4"
+    "primereact": "^10.8.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.0"
   }
 }

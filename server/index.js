@@ -11,6 +11,7 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import paymentCountRoutes from "./routes/paymentCountRoutes.js"
 import attendanceLogsRoutes from "./routes/attendanceLogsRoutes.js";
 import attendanceFetchLogsRoutes from "./routes/attendanceFetchLogsRoutes.js"
+import dpsFormRoutes from "./routes/dpsFormRoutes.js"
 
 dotenv.config();
 
@@ -50,6 +51,9 @@ app.use('/logs', attendanceLogsRoutes)
 
 // Endpoint to get all the attendanceLogs
 app.use('/attendanceLogs', attendanceFetchLogsRoutes)
+
+// Endpoint to get data from DPSfORM
+app.use('/dpsForm', dpsFormRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;

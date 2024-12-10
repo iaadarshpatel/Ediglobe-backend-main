@@ -15,6 +15,7 @@ import DisplayProfile from '../All Components/Profile/DisplayProfile';
 import TeamTree from '../All Components/Team Structure/Tree';
 import TeamStructure from '../All Components/Team Structure/TeamStructure';
 import Landing from '../All Components/LandingPage';
+import DPS from '../All Components/DpsForm';
 
 const AppRoute = () => {
 
@@ -39,6 +40,7 @@ const AppRoute = () => {
                     <Route path="/team" element={<TeamTree />} />
                     <Route path="/teamStructure" element={<TeamStructure />} />
                     <Route path="/Landing" element={<Landing />} />
+                    <Route path="/DPS" element={<DPS />} />
                 </Routes>
             </BrowserRouter>
     );

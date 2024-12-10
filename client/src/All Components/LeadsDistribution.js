@@ -252,7 +252,6 @@ const LeadsDistribution = () => {
       console.error('Error saving lead statuses:', errorMessage);
       alert(errorMessage);
     } finally {
-      // Set saving back to false when the request completes
       setSaving(false);
     }
     fetchMatchedLeads();
