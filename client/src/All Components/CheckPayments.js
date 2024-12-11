@@ -16,21 +16,21 @@ const CheckPayments = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [cache, setCache] = useState({});
-  const [disabled, setDisabled] = useState(false); 
-  const [showToast, setShowToast] = useState(false); 
+  const [disabled, setDisabled] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("Access Token");
   const fetcher = (url) =>
     fetch(url, {
-        headers: {
-            Authorization: token,
-        },
+      headers: {
+        Authorization: token,
+      },
     }).then((res) => res.json());
-    const { data, error: swrError } = useSWR(`${config.hostedUrl}/paymentCount/payment/count`,fetcher,
-      {
-          refreshInterval: 4000,
-      }
+  const { data, error: swrError } = useSWR(`${config.hostedUrl}/paymentCount/payment/count`, fetcher,
+    {
+      refreshInterval: 4000,
+    }
   );
 
   const postSalesCountNumber = data && typeof data.postSalesCount === 'number' ? data.postSalesCount : "Loading..";
@@ -63,9 +63,11 @@ const CheckPayments = () => {
 
     try {
       const token = localStorage.getItem("Access Token");
-      const response = await axios.get(`${config.hostedUrl}/paymentCount/searchpayment/${query}`, {headers: {
-        Authorization: token
-      }});
+      const response = await axios.get(`${config.hostedUrl}/paymentCount/searchpayment/${query}`, {
+        headers: {
+          Authorization: token
+        }
+      });
       if (response.data) {
         setResult(response.data);
         storeInCache(response.data);
@@ -146,17 +148,17 @@ const CheckPayments = () => {
         <SideBar />
         <div className="flex-1 flex items-center justify-center mx-2 p-9 z-10">
           <div className="absolute top-4 right-2 p-2 rounded-xl border border-gray-300 border-b-0 custom-shadow flex flex-col md:flex-row items-center">
-          {isLoading ? (
+            {isLoading ? (
               <Chip color='indigo' value="Loading..." className='normal-case text-white bg-black font-bold inline-block pt-2 ml-1' />
-          ) : swrError ? (
-                <div className="flex space-x-4">
-                  <div className="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
-                  <div className="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
+            ) : swrError ? (
+              <div className="flex space-x-4">
+                <div className="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
+                <div className="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
               </div>
-          ) : (
-            <div>
-              <span className="text-black-500 font-bold">Today's Date: {formattedDate} </span>
-              <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold flex items-center">
+            ) : (
+              <div>
+                <span className="text-black-500 font-bold">Today's Date: {formattedDate} </span>
+                <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold flex items-center">
                   <span className="text-lg md:text-base">Payment Count:</span>
                   <span className="text-green-500 ml-2 text-lg md:text-base">Sales</span>
                   <Chip color='indigo' value={salesCountNumber} className='text-white bg-black font-bold inline-block pt-2 ml-1' />
@@ -164,9 +166,9 @@ const CheckPayments = () => {
                   <span className="mx-2 md:mx-4 border-l border-gray-500 h-6 inline-block"></span>
                   <span className="text-red-500 text-lg md:text-base">Post Sales</span>
                   <Chip color='indigo' value={postSalesCountNumber} className='text-white bg-black font-bold inline-block pt-2 ml-1' />
-              </Typography>
-            </div>
-          )}
+                </Typography>
+              </div>
+            )}
           </div>
 
           <Typography className="mt-4">
@@ -202,7 +204,7 @@ const CheckPayments = () => {
                         placeholder="Enter payment ID, order ID or Email"
                         className={`block w-full rounded-md p-2 shadow-sm ring-1 ring-inset placeholder:text-gray-400 sm:text-sm sm:leading-6
                       ${isLoading || error ? 'bg-gray-200 text-gray-500 cursor-not-allowed ring-gray-200' : 'border-1 text-gray-900 ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600'}`}
-                        disabled={isLoading || error} // Disable input while loading
+                        disabled={isLoading || error} 
                       />
                     </div>
                   </div>
@@ -233,7 +235,7 @@ const CheckPayments = () => {
                           type="button"
                           className="rounded-md bg-red-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                           onClick={handleClear}
-                          disabled={isLoading} // Disable Clear button while loading
+                          disabled={isLoading} 
                         >
                           Clear
                         </button>
@@ -259,7 +261,6 @@ const CheckPayments = () => {
                   </div>
                 </div>
               )}
-
               {/* Display error if any */}
               {error && <div className="font-medium p-3 mt-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400">{error}</div>}
             </div>

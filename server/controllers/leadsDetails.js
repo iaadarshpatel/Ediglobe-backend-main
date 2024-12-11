@@ -4,7 +4,7 @@ const fetchLeadsDetailsById = async (req, res) => {
     const employeeId = req.params.id;
     try {
         const leads = await LeadList.find({ employee_id: employeeId })
-        .sort({ updatedAt: 1 });;
+        .sort({ updatedAt: 1 });
         res.json(leads);
     } catch (err) {
         console.error('Error fetching leads:', err);

@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import SideBar from './Roles/SideBar';
 import LottieFile from './LottieFile';
 import config from '../config';
-import { Card, Chip, Typography } from '@material-tailwind/react';
+import { Button, Card, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from '@material-tailwind/react';
 import { useForm } from 'react-hook-form';
+import { PencilSquareIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid'
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployeesDetails } from '../All Components/redux/slice/employeeSlice'
 import { MdEmail } from "react-icons/md";
-import { FaUserCheck, FaSquarePhone, FaRegCalendarCheck } from "react-icons/fa6";
-import { FaCheckCircle, FaUniversity } from "react-icons/fa";
+import { FaUserCheck, FaSquarePhone, FaRegCalendarCheck, FaFileWaveform } from "react-icons/fa6";
+import { FaUniversity } from "react-icons/fa";
 import { BiSolidSelectMultiple } from "react-icons/bi";
 import { MdOutlineError } from "react-icons/md";
+import Typewriter from 'typewriter-effect';
 import axios from 'axios';
 
 const DpsForm = () => {
@@ -19,14 +21,50 @@ const DpsForm = () => {
     const dispatch = useDispatch();
     const allDetails = useSelector(state => state.employeesDetails);
     const { Employee_Id, Employee_Name } = allDetails.data || {};
-    const [dpsFormData, setDpsFormData] = useState([]);
-    const [todayDay, setTodayDay] = useState(""); 
+    const [studentPersonalEmail, setStudentPersonalEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [dpsFormData, setDpsFormData] = useState(null);
+    const [size, setSize] = useState(false);
+    const handleOpen = (value) => setSize(value);
 
     const [employeeDetails, setEmployeeDetails] = useState({
         Employee_Id: '',
         Employee_Name: ''
     });
-    const customColor = '#000000';
+
+    const handleEmailChange = (e) => {
+        setStudentPersonalEmail(e.target.value);
+        setIsLoading(true);
+    };
+
+    const CheckDpsStatus = async () => {
+        try {
+            const token = localStorage.getItem("Access Token");
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!studentPersonalEmail || !emailRegex.test(studentPersonalEmail)) {
+                setError("Email address is invalid or blank");
+                return;
+            }
+            const response = await axios.get(`${config.hostedUrl}/dpsForm/dpsFormDataById/${studentPersonalEmail}`, {
+                headers: {
+                    Authorization: token,
+                }
+            });
+            if (response.data && response.data.length > 0) {
+                setDpsFormData(response.data);
+                setStudentPersonalEmail("");
+                setError(null);
+            } else {
+                setError("No data found for the provided email.");
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.error || 'Failed to update DPS data';
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     const formatDateTime = () => {
         const date = new Date();
         const todayDate = date.toLocaleDateString("en-US", { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleDateString("en-US", { weekday: 'long' });
@@ -42,18 +80,16 @@ const DpsForm = () => {
             setEmployeeDetails({ Employee_Id, Employee_Name });
             setValue("Employee_Id", Employee_Id);
             setValue("Employee_Name", Employee_Name);
-            setTodayDay(formatDateTime());
         }
     }, [Employee_Id, Employee_Name, setValue]);
 
     const onSubmit = async (data) => {
         const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         const formattedDate = formatDateTime();
-        setTodayDay(formattedDate);
         const dataWithDate = { ...data, DateOfDpsFilled: formattedDate };
-        setDpsFormData(data);
         await delay(3000);
         try {
+            setError(false);
             const token = localStorage.getItem("Access Token");
             const response = await axios.post(`${config.hostedUrl}/dpsForm/dpsFormData`, dataWithDate, {
                 headers: {
@@ -61,13 +97,14 @@ const DpsForm = () => {
                     "Content-Type": "application/json",
                 },
             });
+            setDpsFormData(response.data);
+            alert("DPS data updated successfully!");
             reset();
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Failed to update DPS data';
             alert(errorMessage);
         } finally {
-            console.log("Execution of onSubmit is complete."); // Example action
-            setDpsFormData([]); // Clearing form data or performing cleanup
+            setDpsFormData([]);
         }
     };
 
@@ -77,23 +114,134 @@ const DpsForm = () => {
                 <LottieFile />
                 <SideBar />
                 <Card className="h-full w-full mx-2 opacity-1 bg-custom shadow-none">
-                    <div className="mt-1 pt-3 pb-4 z-10 px-4 rounded-border bg-transparent">
-                        <div className="p-3 mb-3 bg-blue-gray-50 rounded-border">
+                    <div className="w-full flex flex-col sm:flex-row gap-2 mt-1 pt-3 pb-4 z-10 px-4 rounded-border bg-transparent">
+                        <div className="w-1/2 sm:w-1/2 p-3 mb-3 rounded-border">
                             <Typography variant="md" color="blue-gray" className="font-bold">
-                                Daily Payment Form:
+                                Daily Payment Form📝:
                             </Typography>
                             <Typography variant="sm" color="gray" className="font-normal text-blue-gray-500">
-                                This tab contains urgent leads from the Potential Google Form (PGFL). Please prioritize contacting these leads immediately and ensure that their status is updated promptly and accurately.<br />
+                                Please fill out the form to update your DPS data.<br />
                             </Typography>
-                            <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold mb-2">
-                                Employee Id: <Chip color='indigo' value={employeeDetails.Employee_Id || "Loading..."} className='text-white bg-black font-bold inline-block pt-2' /> <br />
+                            <div className="flex flex-col items-start gap-2 mt-1">
+                                <div className="flex items-center gap-2">
+                                    <ClipboardDocumentCheckIcon className="h-5 w-5 text-black" />
+                                    <Typography
+                                        color="gray"
+                                        className="text-sm font-normal text-blue-gray-500">
+                                        Once the DPS form is submitted, it cannot be <span className="text-indigo-800 font-semibold">edited</span> or <span className="text-indigo-800 font-semibold">modified.</span>
+                                    </Typography>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <PencilSquareIcon className="h-5 w-5 text-black" />
+                                    <Typography
+                                        color="gray"
+                                        className="text-sm font-normal text-blue-gray-500"
+                                    >
+                                        Please ensure the <span className="text-yellow-800 font-semibold">correct lead's email ID</span> is entered while filling out the DPS form.
+                                    </Typography>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="w-1/2 sm:w-1/2 p-3 mb-3 rounded-border">
+                            <Typography variant="md" color="blue-gray" className="font-bold">
+                                Check your DPS Status:
                             </Typography>
-                            <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold mb-2">
-                                Employee Name: <Chip color='indigo' value={employeeDetails.Employee_Name || "Loading..."} className='text-white bg-black font-bold inline-block pt-2' /> <br />
-                            </Typography>
-                            <Typography variant="text" color="blue-gray" className="whitespace-nowrap font-bold">
-                                Date: <Chip color='indigo' value={todayDay || "Loading..."} className='text-white bg-black font-bold inline-block pt-2' /> <br />
-                            </Typography>
+                            <div className="relative flex flex-col gap-3 md:flex-row items-center w-full">
+                                <div className="relative w-full">
+                                    <FaUserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter student email"
+                                        value={studentPersonalEmail}
+                                        onChange={handleEmailChange}
+                                        className="w-full py-2.5 pl-12 pr-3 bg-transparent placeholder:text-slate-400 text-slate-600 text-sm border border-gray-400 rounded-md transition duration-300 ease focus:outline-none focus:border-black-400 hover:border-black-300 shadow-sm focus:shadow-lg focus:shadow-gray-400"
+                                    />
+                                </div>
+                                <Button
+                                    className="w-full md:w-auto bg-black text-white rounded-lg"
+                                    type="button"
+                                    onClick={CheckDpsStatus}
+                                >
+                                    Check
+                                </Button>
+                            </div>
+                            <Dialog
+                                open={size === "md"}
+                                size={size || "md"}
+                                handler={handleOpen}
+                                className="h-full overflow-y-auto"
+                            >
+                                <DialogHeader className="text-center sm:text-left">
+                                    <h1 className='flex justify-center'>View all your📝&nbsp;
+                                        <Typewriter
+                                            options={{
+                                                strings: [`<span style="color: #16a34a";">DPS Records exclusively!</span>`],
+                                                autoStart: true,
+                                                loop: true,
+                                                delay: 200, // Adjust typing speed
+                                                deleteSpeed: 100, // Adjust delete speed
+                                            }}
+                                        />
+                                    </h1>
+                                </DialogHeader>
+                                <DialogBody>
+                                    <Typography variant="text" className="whitespace-nowrap font-bold mb-2 text-purple-600 flex items-center">
+                                        Total Domains Opted:
+                                        <Chip color='indigo' value={dpsFormData?.length} className='text-white bg-black font-bold inline-block pt-2 ml-1' />
+                                    </Typography>
+                                    {dpsFormData?.map((item, index) => (
+                                        <div key={index}
+                                            className="border border-gray-300 rounded-lg p-4 mb-4 shadow-sm bg-white">
+                                            <Typography variant="md" color="blue-gray" className="font-bold mt-1">
+                                                Student Email: <span className="font-normal text-blue-gray-500">{item.studentPersonalEmail}</span>
+                                            </Typography>
+                                            <Typography variant="md" color="blue-gray" className="font-bold mt-1">
+                                                Lead Belongs to: <span className="font-normal text-blue-gray-500">{item.Employee_Id}</span>
+                                            </Typography>
+                                            <Typography variant="md" color="blue-gray" className="font-bold mt-1">
+                                                DPS Filled Date: <span className="font-normal text-blue-gray-500">{item.DateOfDpsFilled}</span>
+                                            </Typography>
+                                            <Typography variant="md" color="blue-gray" className="font-bold mt-1">
+                                                Domain Opted: <span className="font-normal text-blue-gray-500">{item.domainOpted}</span>
+                                            </Typography>
+                                        </div>
+                                    ))}
+                                </DialogBody >
+
+                                <DialogFooter>
+                                    <Button className='bg-black w-auto' onClick={handleOpen}>
+                                        <span className='inline'>Back To HomePage 🏠</span>
+                                    </Button>
+                                </DialogFooter>
+                            </Dialog>
+                            {!dpsFormData?.length > 0 && (
+                                <Typography variant="sm" className="font-normal text-black opacity-80 mt-2">
+                                    <b style={{ color: "red", fontWeight: "bold", backgroundColor: "white" }}>Note:</b>
+                                    <span>Use your lead’s <mark>email address</mark> to check the current DPS status and the date when the DPS was filled🔍.</span>
+                                </Typography>
+                            )}
+                            {dpsFormData?.length > 0 ? (
+                                <div className="mt-1 flex flex-col sm:flex-row justify-between items-center">
+                                    <Typography
+                                        variant="sm"
+                                        className="font-normal text-green-700 opacity-90 mt-2 text-center sm:text-left"
+                                    >
+                                        Successfully found the data, click to <strong
+                                            onClick={() => handleOpen("md")}
+                                            className="cursor-pointer text-black font-semibold"
+                                        >View 👀
+                                        </strong>
+                                    </Typography>
+                                    <button
+                                        onClick={() => { setDpsFormData([]); setError(null); }}
+                                        className="mt-4 sm:mt-0 border border-red-300 rounded-lg px-4 py-1.5 text-red-600 bg-white hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-700"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="font-medium p-2 mt-2 text-sm text-red-800 rounded-lg">{error}</div>
+                            )}
                         </div>
                     </div>
                     {/* Daily Payment Form */}
@@ -111,12 +259,13 @@ const DpsForm = () => {
                                         </Typography>
                                     </label>
                                     <div className="relative">
-                                        <FaUserCheck className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black"/>
+                                        <FaUserCheck className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
                                         <input
                                             type="text"
                                             placeholder='Enter Student Name'
                                             {...register("studentName", { required: true, minLength: 3, maxLength: 15 })}
-                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                         />
                                     </div>
                                     {errors.studentName && (
@@ -143,11 +292,13 @@ const DpsForm = () => {
                                                 required: true,
                                                 pattern: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i,
                                             })}
-                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10" />
+                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
+                                        />
                                     </div>
                                     {errors.studentPersonalEmail && (
                                         <p className="text-red-500 text-xs mt-2 flex align-middle gap-1">
-                                            <MdOutlineError className="w-4 h-4" /> Email is required
+                                            <MdOutlineError className="w-4 h-4" />The email is required and must match the one used during registration
                                         </p>
                                     )}
                                 </div>
@@ -170,6 +321,7 @@ const DpsForm = () => {
                                                 pattern: /^[6-9]\d{9}$/,
                                             })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                         />
                                     </div>
                                     {errors.contactNumber && (
@@ -196,7 +348,8 @@ const DpsForm = () => {
                                                 required: true,
                                                 pattern: /^[6-9]\d{9}$/,
                                             })}
-                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                         />
                                     </div>
                                     {errors.whatsAppNumber && (
@@ -221,6 +374,7 @@ const DpsForm = () => {
                                             type="date"
                                             {...register("DateOfRegistration", { required: true })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                         />
                                     </div>
                                     {errors.DateOfRegistration && (
@@ -244,7 +398,8 @@ const DpsForm = () => {
                                             placeholder='Enter College Name'
                                             type="text"
                                             {...register("collegeName", { required: true, minLength: 3, maxLength: 40 })}
-                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
+                                            className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                         />
                                     </div>
                                     {errors.collegeName && (
@@ -264,7 +419,9 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("department", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                        <select {...register("department", { required: true })}
+                                            className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
                                             placeholder="Select Department">
                                             <option value="">Choose department</option>
                                             <option value="Engineering">Engineering</option>
@@ -291,7 +448,9 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("stream", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("stream", { required: true })}
+                                            className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting} >
                                             <option value="">Choose Stream</option>
                                             <option value="CSE/IT">CSE/IT</option>
                                             <option value="ECE/EEE">ECE/EEE</option>
@@ -319,7 +478,8 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("graduationYear", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("graduationYear", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting} >
                                             <option value="">Choose Graduation Year</option>
                                             <option value="1st">1st</option>
                                             <option value="2nd">2nd</option>
@@ -344,7 +504,8 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("domainOpted", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("domainOpted", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting} >
                                             <option value="">Choose Domain</option>
                                             <option value="MERN">MERN</option>
                                             <option value="Data Science">Data Science</option>
@@ -369,7 +530,8 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("domainType", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("domainType", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting} >
                                             <option value="">Choose Domain Type</option>
                                             <option value="Slef Learning">Slef Learning</option>
                                             <option value="Self Learning with ADD ON">Self Learning with ADD ON</option>
@@ -394,7 +556,8 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("amountPitched", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("amountPitched", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting} >
                                             <option value="">Choose Amount</option>
                                             <option value="1000">1000</option>
                                             <option value="3500">3500</option>
@@ -422,7 +585,10 @@ const DpsForm = () => {
                                     </label>
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
-                                        <select {...register("amountPaid", { required: true })} className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10">
+                                        <select {...register("amountPaid", { required: true })}
+                                            className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
+                                            disabled={isSubmitting}
+                                        >
                                             <option value="">Choose Amount Paid</option>
                                             <option value="1000">1000</option>
                                             <option value="1500">1500</option>
@@ -459,7 +625,7 @@ const DpsForm = () => {
                                     />
                                 </div>
                             </div>
-                            <input type="submit" className='bg-black text-white p-3 w-32 rounded-lg' disabled={isSubmitting} value={isSubmitting ? "Submitting..." : "Submit"} />
+                            <input type="submit" className='bg-black text-white p-3 w-32 rounded-lg cursor-pointer' disabled={isSubmitting} value={isSubmitting ? "Submitting..." : "Submit"} />
                         </form>
                     </div>
                 </Card>

@@ -15,7 +15,6 @@ const allAttendanceLogsFetchById = async (req, res) => {
     try {
         const response = await Attendance.find({ Employee_Id: employeeId })
             .sort({ updatedAt: 1 }); // Sorting by updatedAt in ascending order
-
         if (response.length === 0) {
             return res.status(404).json({ error: 'Attendance log not found' });
         }
