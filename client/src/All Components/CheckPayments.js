@@ -204,12 +204,11 @@ const CheckPayments = () => {
                         placeholder="Enter payment ID, order ID or Email"
                         className={`block w-full rounded-md p-2 shadow-sm ring-1 ring-inset placeholder:text-gray-400 sm:text-sm sm:leading-6
                       ${isLoading || error ? 'bg-gray-200 text-gray-500 cursor-not-allowed ring-gray-200' : 'border-1 text-gray-900 ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600'}`}
-                        disabled={isLoading || error} 
+                        disabled={isLoading || error}
                       />
                     </div>
                   </div>
                   <div>
-
                     <div className="flex justify-center space-x-4 mt-4">
                       <button
                         type="submit"
@@ -235,7 +234,7 @@ const CheckPayments = () => {
                           type="button"
                           className="rounded-md bg-red-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                           onClick={handleClear}
-                          disabled={isLoading} 
+                          disabled={isLoading}
                         >
                           Clear
                         </button>

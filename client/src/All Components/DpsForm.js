@@ -8,12 +8,13 @@ import { PencilSquareIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/2
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployeesDetails } from '../All Components/redux/slice/employeeSlice'
 import { MdEmail } from "react-icons/md";
-import { FaUserCheck, FaSquarePhone, FaRegCalendarCheck, FaFileWaveform } from "react-icons/fa6";
+import { FaUserCheck, FaSquarePhone, FaRegCalendarCheck } from "react-icons/fa6";
 import { FaUniversity } from "react-icons/fa";
 import { BiSolidSelectMultiple } from "react-icons/bi";
 import { MdOutlineError } from "react-icons/md";
 import Typewriter from 'typewriter-effect';
 import axios from 'axios';
+import { Hourglass } from 'react-loader-spinner';
 
 const DpsForm = () => {
     const { register, handleSubmit, setValue, reset, formState: { errors, isSubmitting } } = useForm();
@@ -35,7 +36,7 @@ const DpsForm = () => {
 
     const handleEmailChange = (e) => {
         setStudentPersonalEmail(e.target.value);
-        setIsLoading(true);
+        setIsLoading(false);
     };
 
     const CheckDpsStatus = async () => {
@@ -46,6 +47,7 @@ const DpsForm = () => {
                 setError("Email address is invalid or blank");
                 return;
             }
+            setIsLoading(true);
             const response = await axios.get(`${config.hostedUrl}/dpsForm/dpsFormDataById/${studentPersonalEmail}`, {
                 headers: {
                     Authorization: token,
@@ -54,9 +56,12 @@ const DpsForm = () => {
             if (response.data && response.data.length > 0) {
                 setDpsFormData(response.data);
                 setStudentPersonalEmail("");
+                setIsLoading(false);
                 setError(null);
             } else {
                 setError("No data found for the provided email.");
+                setStudentPersonalEmail("");
+                setIsLoading(false);
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Failed to update DPS data';
@@ -115,12 +120,12 @@ const DpsForm = () => {
                 <SideBar />
                 <Card className="h-full w-full mx-2 opacity-1 bg-custom shadow-none">
                     <div className="w-full flex flex-col sm:flex-row gap-2 mt-1 pt-3 pb-4 z-10 px-4 rounded-border bg-transparent">
-                        <div className="w-1/2 sm:w-1/2 p-3 mb-3 rounded-border">
+                        <div className="w-full sm:w-1/2 p-3 mb-3 rounded-border">
                             <Typography variant="md" color="blue-gray" className="font-bold">
                                 Daily Payment Form📝:
                             </Typography>
                             <Typography variant="sm" color="gray" className="font-normal text-blue-gray-500">
-                                Please fill out the form to update your DPS data.<br />
+                                Please fill out your DPS form on the same day you receive the payment.<br />
                             </Typography>
                             <div className="flex flex-col items-start gap-2 mt-1">
                                 <div className="flex items-center gap-2">
@@ -142,7 +147,7 @@ const DpsForm = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-1/2 sm:w-1/2 p-3 mb-3 rounded-border">
+                        <div className="w-full sm:w-1/2 p-3 mb-3 rounded-border">
                             <Typography variant="md" color="blue-gray" className="font-bold">
                                 Check your DPS Status:
                             </Typography>
@@ -160,9 +165,18 @@ const DpsForm = () => {
                                 <Button
                                     className="w-full md:w-auto bg-black text-white rounded-lg"
                                     type="button"
-                                    onClick={CheckDpsStatus}
-                                >
-                                    Check
+                                    onClick={CheckDpsStatus}>
+                                    {isLoading ? (
+                                        <Hourglass
+                                            visible={true}
+                                            height="20"
+                                            width="16"
+                                            ariaLabel="hourglass-loading"
+                                            colors={["white"]}
+                                        />
+                                    ) : (
+                                        "Check"
+                                    )}
                                 </Button>
                             </div>
                             <Dialog
@@ -207,7 +221,6 @@ const DpsForm = () => {
                                         </div>
                                     ))}
                                 </DialogBody >
-
                                 <DialogFooter>
                                     <Button className='bg-black w-auto' onClick={handleOpen}>
                                         <span className='inline'>Back To HomePage 🏠</span>
@@ -217,7 +230,7 @@ const DpsForm = () => {
                             {!dpsFormData?.length > 0 && (
                                 <Typography variant="sm" className="font-normal text-black opacity-80 mt-2">
                                     <b style={{ color: "red", fontWeight: "bold", backgroundColor: "white" }}>Note:</b>
-                                    <span>Use your lead’s <mark>email address</mark> to check the current DPS status and the date when the DPS was filled🔍.</span>
+                                    <span> Use your lead’s <mark>email address</mark> to check the current DPS status and the date when the DPS was filled🔍.</span>
                                 </Typography>
                             )}
                             {dpsFormData?.length > 0 ? (
@@ -244,6 +257,7 @@ const DpsForm = () => {
                             )}
                         </div>
                     </div>
+
                     {/* Daily Payment Form */}
                     <div className="mt-1 pt-3 pb-4 z-10 px-4 rounded-border bg-transparent">
                         <form
@@ -505,12 +519,32 @@ const DpsForm = () => {
                                     <div className="relative">
                                         <BiSolidSelectMultiple className="absolute left-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-1 rounded-lg bg-blue-gray-50 text-black" />
                                         <select {...register("domainOpted", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
-                                            disabled={isSubmitting} >
+                                            disabled={isSubmitting}>
                                             <option value="">Choose Domain</option>
-                                            <option value="MERN">MERN</option>
+                                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                            <option value="Machine Learning">Machine Learning</option>
                                             <option value="Data Science">Data Science</option>
-                                            <option value="Artifical Intelligence">Artifical Intelligence</option>
+                                            <option value="Web Development">Web Development</option>
+                                            <option value="JAVA">JAVA</option>
                                             <option value="Cyber Security">Cyber Security</option>
+                                            <option value="Amazon Web Services">Amazon Web Services</option>
+                                            <option value="Python">Python</option>
+                                            <option value="Android Development">Android Development</option>
+                                            <option value="Stock Marketing">Stock Marketing</option>
+                                            <option value="Business Analytics">Business Analytics</option>
+                                            <option value="Very Large Scale Integration">Very Large Scale Integration</option>
+                                            <option value="NANO Science">NANO Science</option>
+                                            <option value="Bio-informatics">Bio-informatics</option>
+                                            <option value="Genetic Engineering">Genetic Engineering</option>
+                                            <option value="IoT-Robotics">IoT-Robotics</option>
+                                            <option value="Car Designing">Car Designing</option>
+                                            <option value="AutoCAD">AutoCAD</option>
+                                            <option value="Hybrid & Electric Vehicles">Hybrid & Electric Vehicles</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Digital Marketing">Digital Marketing</option>
+                                            <option value="Construction Planning">Construction Planning</option>
+                                            <option value="Embedded Systems">Embedded Systems</option>
+                                            <option value="Human Resources">Human Resources</option>
                                         </select>
                                     </div>
                                     {errors.domainOpted && (
@@ -559,7 +593,6 @@ const DpsForm = () => {
                                         <select {...register("amountPitched", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting} >
                                             <option value="">Choose Amount</option>
-                                            <option value="1000">1000</option>
                                             <option value="3500">3500</option>
                                             <option value="4000">4000</option>
                                             <option value="4500">4500</option>
@@ -625,7 +658,8 @@ const DpsForm = () => {
                                     />
                                 </div>
                             </div>
-                            <input type="submit" className='bg-black text-white p-3 w-32 rounded-lg cursor-pointer' disabled={isSubmitting} value={isSubmitting ? "Submitting..." : "Submit"} />
+                            <input type="submit" className={`bg-black text-white p-3 w-32 rounded-lg cursor-pointer ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                }`} disabled={isSubmitting} value={isSubmitting ? "Submitting..." : "Submit"} />
                         </form>
                     </div>
                 </Card>
