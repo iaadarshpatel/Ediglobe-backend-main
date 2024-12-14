@@ -96,6 +96,14 @@ const DpsForm = () => {
         try {
             setError(false);
             const token = localStorage.getItem("Access Token");
+            const { studentPersonalEmail, domainOpted } = data;
+            console.log(data);
+            if (studentPersonalEmail === dpsFormData.studentPersonalEmail &&
+                domainOpted === dpsFormData.domainOpted
+            ) {
+                alert("DPS data already exists for the provided email.");
+                return;
+            }
             const response = await axios.post(`${config.hostedUrl}/dpsForm/dpsFormData`, dataWithDate, {
                 headers: {
                     Authorization: token,
@@ -280,6 +288,7 @@ const DpsForm = () => {
                                             {...register("studentName", { required: true, minLength: 3, maxLength: 15 })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.studentName && (
@@ -308,6 +317,7 @@ const DpsForm = () => {
                                             })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.studentPersonalEmail && (
@@ -336,6 +346,7 @@ const DpsForm = () => {
                                             })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.contactNumber && (
@@ -364,6 +375,7 @@ const DpsForm = () => {
                                             })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.whatsAppNumber && (
@@ -389,6 +401,7 @@ const DpsForm = () => {
                                             {...register("DateOfRegistration", { required: true })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-red-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.DateOfRegistration && (
@@ -414,6 +427,7 @@ const DpsForm = () => {
                                             {...register("collegeName", { required: true, minLength: 3, maxLength: 40 })}
                                             className="w-full py-2 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting}
+                                            autocomplete="off"
                                         />
                                     </div>
                                     {errors.collegeName && (
@@ -567,10 +581,11 @@ const DpsForm = () => {
                                         <select {...register("domainType", { required: true })} className="w-full py-2.5 pl-12 pr-3 border rounded-md border-dashed border-gray-600 bg-white text-gray-900 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:border-gray-500 focus:ring-gray-900/10"
                                             disabled={isSubmitting} >
                                             <option value="">Choose Domain Type</option>
-                                            <option value="Slef Learning">Slef Learning</option>
+                                            <option value="Self Learning">Self Learning</option>
                                             <option value="Self Learning with ADD ON">Self Learning with ADD ON</option>
                                             <option value="Expert Lead Program">Expert Lead Program</option>
                                             <option value="Expert Lead Program with ADD ON">Expert Lead Program with ADD ON</option>
+                                            <option value="Offline">Offline</option>
                                         </select>
                                     </div>
                                     {errors.domainType && (
@@ -599,6 +614,7 @@ const DpsForm = () => {
                                             <option value="5000">5000</option>
                                             <option value="5500">5500</option>
                                             <option value="7500">7500</option>
+                                            <option value="12000-18000">12000-18000</option>
                                         </select>
                                     </div>
                                     {errors.amountPitched && (

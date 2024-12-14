@@ -10,8 +10,9 @@ import employeesRoutes from "./routes/employeesRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import paymentCountRoutes from "./routes/paymentCountRoutes.js"
 import attendanceLogsRoutes from "./routes/attendanceLogsRoutes.js";
-import attendanceFetchLogsRoutes from "./routes/attendanceFetchLogsRoutes.js"
-import dpsFormRoutes from "./routes/dpsFormRoutes.js"
+import attendanceFetchLogsRoutes from "./routes/attendanceFetchLogsRoutes.js";
+import dpsFormRoutes from "./routes/dpsFormRoutes.js";
+import accessControlRoutes from "./routes/accessControlRoutes.js";
 
 dotenv.config();
 
@@ -54,6 +55,8 @@ app.use('/attendanceLogs', attendanceFetchLogsRoutes)
 
 // Endpoint to get data from DPSfORM
 app.use('/dpsForm', dpsFormRoutes);
+
+app.use('/accessControl', accessControlRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;

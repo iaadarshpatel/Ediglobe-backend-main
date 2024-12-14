@@ -14,7 +14,7 @@ const dpsFormSchema = new mongoose.Schema({
     graduationYear: { type: String, required: true },
     domainOpted: { type: String, required: true },
     domainType: { type: String, required: true },
-    amountPitched: { type: Number, required: true },
+    amountPitched: { type: String, required: true },
     amountPaid: { type: String, required: true },
     DateOfDpsFilled: { type: String},
 }, { timestamps: true });

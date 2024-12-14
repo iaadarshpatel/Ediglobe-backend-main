@@ -2,10 +2,8 @@ import AttendanceLogs from "../models/AttendanceLogs.js";
 
 const attendanceLogsInsert = async (req, res) => {
     const { employeeId, clockInTime, clockInAddress, clockOutTime, clockOutAddress, attendanceMarkDate, clockInLatitude, clockInLongitude, clockOutLatitude, clockOutLongitude } = req.body;
-    console.log(req.body);
     try {
         if (!clockOutTime) {
-            console.log("Clock-in request received.");
             const newLog = new AttendanceLogs({
                 Employee_Id: employeeId,
                 clockInTime,
@@ -14,7 +12,6 @@ const attendanceLogsInsert = async (req, res) => {
                 clockInAddress,
                 attendanceMarkDate,
             });
-            console.log("New log created:", newLog);
             
             await newLog.save();
             return res.status(201).json({ message: "Clock-in successful", log: newLog });
